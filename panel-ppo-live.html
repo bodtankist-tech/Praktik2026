@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Панель приладів протиповітряної оборони</title>
+<style>
+:root{
+  --ink:#131a24; --ink-soft:#5c6a7c; --field:#e3e8ed; --panel:#fff;
+  --line:#c7d0da; --missile:#a8322a; --drone:#1f5f80; --hit:#2f7d5f; --miss:#b8bfc8;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"IBM Plex Sans","Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"IBM Plex Mono",Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--field);color:var(--ink);font-family:var(--body);
+     font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 64px}
+
+.masthead{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;
+          gap:20px;padding-bottom:18px;border-bottom:2px solid var(--ink)}
+.masthead h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,4.4vw,44px);
+             letter-spacing:-.015em;line-height:1.02;margin:0;text-transform:uppercase}
+.masthead p{margin:6px 0 0;color:var(--ink-soft);font-size:14px;max-width:46ch}
+
+.range{display:flex;gap:2px;border:1px solid var(--ink);padding:2px}
+.range button{font-family:var(--mono);font-size:12px;letter-spacing:.04em;padding:7px 13px;
+              border:0;background:transparent;color:var(--ink);cursor:pointer}
+.range button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
+button:focus-visible{outline:2px solid var(--drone);outline-offset:2px}
+
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px;
+     background:var(--panel);border:1px solid var(--line);padding:12px 16px}
+.bar .act{font-family:var(--mono);font-size:12px;letter-spacing:.03em;padding:8px 14px;
+          border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer}
+.bar .act.ghost{background:transparent;color:var(--ink)}
+.bar .act[disabled]{opacity:.45;cursor:default}
+.bar .status{font-size:13px;color:var(--ink-soft);flex:1;min-width:220px}
+.bar .status.err{color:var(--missile)}
+.bar .status.ok{color:var(--hit)}
+
+.summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+.stat{background:var(--panel);border:1px solid var(--line);border-top:4px solid var(--accent);
+      padding:18px 20px 20px}
+.stat h2{font-family:var(--display);font-size:15px;letter-spacing:.09em;text-transform:uppercase;
+         margin:0 0 14px;color:var(--accent)}
+.stat .rate{font-family:var(--mono);font-weight:600;font-size:clamp(40px,7vw,62px);
+            line-height:.92;letter-spacing:-.03em}
+.stat .rate small{font-size:.42em;color:var(--ink-soft);margin-left:4px;font-weight:400}
+.stat dl{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;margin:16px 0 0;
+         padding-top:14px;border-top:1px solid var(--line)}
+.stat dt{font-size:12px;color:var(--ink-soft)}
+.stat dd{font-family:var(--mono);font-size:20px;margin:0;grid-row:2}
+
+.panel{background:var(--panel);border:1px solid var(--line);margin-top:16px;padding:20px}
+.panel-head{display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;
+            justify-content:space-between;margin-bottom:18px}
+.panel-head h2{font-family:var(--display);font-size:17px;letter-spacing:.06em;
+               text-transform:uppercase;margin:0}
+.panel-head .hint{font-size:13px;color:var(--ink-soft);max-width:58ch}
+.legend{display:flex;gap:16px;font-size:13px;color:var(--ink-soft)}
+.legend i{display:inline-block;width:11px;height:11px;margin-right:6px;vertical-align:-1px}
+
+.chart{width:100%;height:auto;display:block}
+.chart .grid{stroke:#e6eaee;stroke-width:1}
+.chart .axis{fill:var(--ink-soft);font-family:var(--mono);font-size:11px}
+.chart .area{fill:#dfe4ea;stroke:#98a3b0;stroke-width:1}
+.chart .line{fill:none;stroke:var(--hit);stroke-width:2}
+.chart .marker{fill:var(--hit)}
+
+.strip{display:grid;gap:3px;max-height:460px;overflow-y:auto}
+.day{display:grid;grid-template-columns:72px 1fr 58px 26px;align-items:center;gap:10px;padding:3px 2px}
+.day:hover{background:#f4f6f8}
+.day .date{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+.day .track{display:flex;height:16px;border:1px solid var(--line);
+            background:repeating-linear-gradient(90deg,#eef1f4 0 5px,transparent 5px 6px)}
+.day .seg{height:100%}
+.day .pct{font-family:var(--mono);font-size:12px;text-align:right}
+.day .pct.low{color:var(--missile);font-weight:600}
+.day .src{font-family:var(--mono);font-size:10px;color:var(--ink-soft);text-align:center}
+
+textarea{width:100%;min-height:130px;font-family:var(--mono);font-size:12px;padding:10px;
+         border:1px solid var(--line);resize:vertical}
+.fields{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px;align-items:flex-end}
+.fields label{display:flex;flex-direction:column;font-size:11px;color:var(--ink-soft);gap:4px}
+.fields input{font-family:var(--mono);font-size:14px;padding:7px 8px;border:1px solid var(--line);width:120px}
+
+.footnote{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);
+          font-size:13px;color:var(--ink-soft)}
+.footnote code{font-family:var(--mono);font-size:12px;background:#d8dee5;padding:1px 5px}
+
+@media (max-width:720px){
+  .summary{grid-template-columns:1fr}
+  .day{grid-template-columns:62px 1fr 46px 22px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <div>
+      <h1>Панель приладів<br>протиповітряної оборони</h1>
+      <p id="subtitle">Співвідношення випущених і збитих засобів повітряного нападу.</p>
+    </div>
+    <div class="range" role="group" aria-label="Період">
+      <button data-range="7">7 ДНІВ</button>
+      <button data-range="30" aria-pressed="true">30 ДНІВ</button>
+      <button data-range="0">УСЕ</button>
+    </div>
+  </header>
+
+  <div class="bar">
+    <button class="act" id="btn-fetch">Оновити зі зведень ПС ЗСУ</button>
+    <span class="status" id="status">Дані зі сховища браузера.</span>
+    <button class="act ghost" id="btn-export">Зберегти JSON</button>
+  </div>
+
+  <div class="summary">
+    <section class="stat" style="--accent:#a8322a">
+      <h2>Ракети</h2>
+      <div class="rate"><span id="m-rate">0</span><small>%</small></div>
+      <dl><dt>Випущено</dt><dt>Збито</dt><dd id="m-launched">0</dd><dd id="m-hit">0</dd></dl>
+    </section>
+    <section class="stat" style="--accent:#1f5f80">
+      <h2>Безпілотники</h2>
+      <div class="rate"><span id="d-rate">0</span><small>%</small></div>
+      <dl><dt>Випущено</dt><dt>Збито</dt><dd id="d-launched">0</dd><dd id="d-hit">0</dd></dl>
+    </section>
+  </div>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Динаміка за добами</h2>
+      <div class="legend">
+        <span><i style="background:#b8bfc8"></i>випущено</span>
+        <span><i style="background:#2f7d5f"></i>збито</span>
+      </div>
+    </div>
+    <svg class="chart" id="chart" viewBox="0 0 840 300" preserveAspectRatio="xMidYMid meet"
+         role="img" aria-label="Графік випущених і збитих цілей за добами"></svg>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Смуга перехоплення</h2>
+      <span class="hint">Довжина смуги — усе, що летіло за добу; заповнена частина — збите.
+        Червоним позначено доби зі збиттям нижче 70&nbsp;%. Позначка «з» — доба зі зведення,
+        «д» — демонстраційна.</span>
+    </div>
+    <div class="strip" id="strip"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Додати зведення вручну</h2>
+      <span class="hint">Якщо автооновлення не спрацювало: скопіюйте текст зведення з
+        t.me/s/kpszsu і вставте сюди. Цифри перевірте перед додаванням.</span>
+    </div>
+    <textarea id="paste" placeholder="⚡️ ЗБИТО/ПОДАВЛЕНО 163 ВОРОЖІ БПЛА&#10;У ніч на 03 серпня (з 18:00 02 серпня) противник атакував 181-м ударним БпЛА…"></textarea>
+    <div class="fields">
+      <label>Дата<input type="date" id="f-date"></label>
+      <label>Ракет випущено<input type="number" id="f-ml" min="0" value="0"></label>
+      <label>Ракет збито<input type="number" id="f-mi" min="0" value="0"></label>
+      <label>БпЛА випущено<input type="number" id="f-dl" min="0" value="0"></label>
+      <label>БпЛА збито<input type="number" id="f-di" min="0" value="0"></label>
+      <button class="act ghost" id="btn-parse">Розпізнати</button>
+      <button class="act" id="btn-add">Додати добу</button>
+    </div>
+  </section>
+
+  <p class="footnote">
+    Джерело: офіційні ранкові зведення Командування Повітряних Сил ЗСУ (<code>t.me/s/kpszsu</code>).
+    Доби, позначені «д», — згенеровані демонстраційні дані, вони зникнуть, щойно на їхнє місце
+    стануть справжні. Розпізнавання тексту не бездоганне: звіряйте цифри.
+  </p>
+</div>
+
+<script>
+/* ---------- демонстраційна заготовка + реальні доби зі зведень ---------- */
+const SEED = [
+  ["2026-07-22", 4, 3, 216, 204, "з"],
+  ["2026-07-26", 8, 6, 136, 104, "з"],
+  ["2026-08-03", 0, 0, 181, 163, "з"],
+  ["2026-08-07", 0, 0, 147, 114, "з"],
+  ["2026-07-09", 6, 4, 128, 108, "д"], ["2026-07-11", 2, 1, 95, 74, "д"],
+  ["2026-07-13", 0, 0, 152, 131, "д"], ["2026-07-15", 2, 1, 122, 101, "д"],
+  ["2026-07-17", 5, 4, 88, 69, "д"],  ["2026-07-19", 0, 0, 141, 119, "д"],
+  ["2026-07-24", 3, 2, 107, 86, "д"], ["2026-07-28", 9, 6, 198, 172, "д"],
+  ["2026-07-30", 0, 0, 116, 97, "д"], ["2026-08-01", 2, 2, 158, 154, "д"],
+  ["2026-08-05", 4, 3, 133, 112, "д"]
+];
+
+/* ---------- сховище ---------- */
+const KEY = "ppo-data-v1";
+let memory = null;
+
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) { /* приватний режим або file:// без доступу */ }
+  return memory || SEED.map(r => ({ date:r[0], ml:r[1], mi:r[2], dl:r[3], di:r[4], src:r[5] }));
+}
+
+function save(rows) {
+  memory = rows;
+  try { localStorage.setItem(KEY, JSON.stringify(rows)); return true; }
+  catch (e) { return false; }
+}
+
+/* ---------- розбір зведення ---------- */
+const MONTHS = {"січня":1,"лютого":2,"березня":3,"квітня":4,"травня":5,"червня":6,
+  "липня":7,"серпня":8,"вересня":9,"жовтня":10,"листопада":11,"грудня":12};
+
+const WORDNUM = {"одну":1,"одна":1,"один":1,"одним":1,"однією":1,"одного":1,"двома":2,
+  "два":2,"дві":2,"трьома":3,"три":3,"чотирма":4,"чотири":4,"п'ятьма":5,"п'ять":5,
+  "шістьма":6,"шість":6,"сімома":7,"сім":7,"вісьмома":8,"вісім":8,"дев'ятьма":9,
+  "дев'ять":9,"десятьма":10,"десять":10};
+
+const MISSILE_NOUN = /^ракет(а|и|у|о[юї]|ами|ам|ах)?$/iu;
+
+function countMissiles(s) {
+  const toks = s.split(/[\s,.;:()«»"']+/u).filter(Boolean);
+  let sum = 0;
+  for (let i = 0; i < toks.length; i++) {
+    if (!MISSILE_NOUN.test(toks[i])) continue;
+    let n = 1;
+    for (let b = 1; b <= 4 && i - b >= 0; b++) {
+      const tok = toks[i - b].toLowerCase();
+      if (/^\d+$/.test(tok)) { n = +tok; break; }
+      if (WORDNUM[tok] !== undefined) { n = WORDNUM[tok]; break; }
+    }
+    sum += n;
+  }
+  return sum;
+}
+
+function countDrones(s) {
+  const m = s.match(/(\d+)\s*[-–]?\s*(?:\p{L}{1,3}\s+)?(?:\p{L}+\s+){0,2}?(?:БпЛА|безпілотник\p{L}*|дрон\p{L}*)/iu);
+  return m ? +m[1] : 0;
+}
+
+function parseReport(text) {
+  const t = text.replace(/\u00a0/g, " ");
+  const out = { date:"", ml:0, mi:0, dl:0, di:0 };
+
+  const dm = t.match(/ніч\p{L}*\s+на\s+(\d{1,2})\s+(\p{L}+)/iu);
+  if (dm && MONTHS[dm[2].toLowerCase()]) {
+    const day = +dm[1], mon = MONTHS[dm[2].toLowerCase()], now = new Date();
+    let year = now.getFullYear();
+    if (mon > now.getMonth() + 1) year -= 1;
+    out.date = year + "-" + String(mon).padStart(2,"0") + "-" + String(day).padStart(2,"0");
+  }
+
+  const cut = t.search(/збито\s*\/?\s*(?:або\s+)?(?:подавлено|знешкоджено)/iu);
+  const attack = cut > 0 ? t.slice(0, cut) : t;
+  const result = cut > 0 ? t.slice(cut) : "";
+
+  out.dl = countDrones(attack);
+  out.di = countDrones(result);
+  out.ml = countMissiles(attack);
+  out.mi = countMissiles(result);
+  return out;
+}
+
+function parseFeed(text) {
+  const chunks = text.split(/(?=У\s+ніч\s+на\s+\d)/u);
+  const found = [];
+  for (const c of chunks) {
+    if (!/ніч\p{L}*\s+на\s+\d/iu.test(c)) continue;
+    const r = parseReport(c.slice(0, 1200));
+    if (r.date && (r.dl > 0 || r.ml > 0)) found.push({ ...r, src: "з" });
+  }
+  return found;
+}
+
+/* ---------- автооновлення ---------- */
+const SOURCE = "https://t.me/s/kpszsu";
+const PROXIES = [
+  u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u),
+  u => "https://corsproxy.io/?" + encodeURIComponent(u),
+  u => "https://r.jina.ai/" + u
+];
+
+function stripHtml(s) {
+  return s.replace(/<br\s*\/?>/gi, "\n")
+          .replace(/<[^>]+>/g, " ")
+          .replace(/&nbsp;/g, " ").replace(/&quot;/g, '"')
+          .replace(/&#39;/g, "'").replace(/&amp;/g, "&")
+          .replace(/&laquo;|&raquo;/g, '"');
+}
+
+async function refresh() {
+  const btn = $("btn-fetch"), st = $("status");
+  btn.disabled = true;
+  st.className = "status";
+  st.textContent = "Звертаюся до каналу…";
+
+  for (let i = 0; i < PROXIES.length; i++) {
+    try {
+      const res = await fetch(PROXIES[i](SOURCE), { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const found = parseFeed(stripHtml(await res.text()));
+      if (!found.length) throw new Error("зведень не знайдено");
+
+      const map = new Map(load().map(r => [r.date, r]));
+      let added = 0;
+      for (const r of found) {
+        const old = map.get(r.date);
+        if (!old || old.src === "д") { map.set(r.date, r); added++; }
+      }
+      const rows = [...map.values()].sort((a, b) => a.date.localeCompare(b.date));
+      const stored = save(rows);
+      st.className = "status ok";
+      st.textContent = "Оновлено: розпізнано " + found.length + " зведень, нових діб " + added +
+                       (stored ? "." : ". Сховище недоступне — збережіть JSON, щоб не втратити.");
+      render(current);
+      btn.disabled = false;
+      return;
+    } catch (e) {
+      st.textContent = "Проксі " + (i + 1) + " не відповів, пробую наступний…";
+    }
+  }
+
+  st.className = "status err";
+  st.textContent = "Автооновлення не вдалося. Скопіюйте текст зведення з t.me/s/kpszsu " +
+                   "і вставте у поле внизу сторінки.";
+  btn.disabled = false;
+}
+
+/* ---------- відображення ---------- */
+const pct = (part, whole) => whole > 0 ? Math.min(100, Math.round(part / whole * 100)) : 0;
+const shortDate = iso => { const p = iso.split("-"); return p[2] + "." + p[1]; };
+const $ = id => document.getElementById(id);
+let current = 30;
+
+function render(range) {
+  current = range;
+  const all = load().slice().sort((a, b) => a.date.localeCompare(b.date));
+  const view = range === 0 ? all : all.slice(-range);
+  if (!view.length) return;
+
+  const t = view.reduce((a, r) => ({
+    ml: a.ml + r.ml, mi: a.mi + r.mi, dl: a.dl + r.dl, di: a.di + r.di
+  }), { ml:0, mi:0, dl:0, di:0 });
+
+  $("m-rate").textContent = pct(t.mi, t.ml);
+  $("m-launched").textContent = t.ml.toLocaleString("uk-UA");
+  $("m-hit").textContent = t.mi.toLocaleString("uk-UA");
+  $("d-rate").textContent = pct(t.di, t.dl);
+  $("d-launched").textContent = t.dl.toLocaleString("uk-UA");
+  $("d-hit").textContent = t.di.toLocaleString("uk-UA");
+
+  const real = view.filter(r => r.src === "з").length;
+  $("subtitle").textContent = "Період: " + view[0].date + " — " + view[view.length-1].date +
+    ", " + view.length + " діб, з них " + real + " зі зведень ПС ЗСУ.";
+
+  drawChart(view);
+  drawStrip(view);
+}
+
+function drawChart(view) {
+  const W = 840, H = 300, pad = { t:12, r:12, b:26, l:44 };
+  const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+  const max = Math.max.apply(null, view.map(r => r.ml + r.dl).concat([10]));
+  const step = view.length > 1 ? iw / (view.length - 1) : 0;
+  const x = i => pad.l + i * step;
+  const y = v => pad.t + ih - (v / max) * ih;
+
+  let ticks = "";
+  for (let k = 0; k <= 4; k++) {
+    const val = Math.round(max * k / 4), yy = y(val);
+    ticks += '<line class="grid" x1="' + pad.l + '" y1="' + yy + '" x2="' + (W-pad.r) + '" y2="' + yy + '"/>' +
+             '<text class="axis" x="' + (pad.l-8) + '" y="' + (yy+4) + '" text-anchor="end">' + val + '</text>';
+  }
+
+  const pts = view.map((r, i) => x(i) + "," + y(r.ml + r.dl));
+  const area = "M" + pad.l + "," + y(0) + " L" + pts.join(" L") + " L" + x(view.length-1) + "," + y(0) + " Z";
+  const line = "M" + view.map((r, i) => x(i) + "," + y(r.mi + r.di)).join(" L");
+
+  const every = Math.max(1, Math.ceil(view.length / 10));
+  let labels = "";
+  view.forEach((r, i) => {
+    if (i % every === 0 || i === view.length - 1)
+      labels += '<text class="axis" x="' + x(i) + '" y="' + (H-6) + '" text-anchor="middle">' +
+                shortDate(r.date) + '</text>';
+  });
+
+  const last = view[view.length-1];
+  const dot = '<circle class="marker" cx="' + x(view.length-1) + '" cy="' + y(last.mi+last.di) + '" r="3.5"/>';
+  $("chart").innerHTML = ticks + '<path class="area" d="' + area + '"/>' +
+                         '<path class="line" d="' + line + '"/>' + dot + labels;
+}
+
+function drawStrip(view) {
+  $("strip").innerHTML = view.slice().reverse().map(r => {
+    const launched = r.ml + r.dl, hit = r.mi + r.di, rate = pct(hit, launched);
+    const w = n => launched > 0 ? (n / launched * 100) + "%" : "0%";
+    return '<div class="day">' +
+      '<span class="date">' + shortDate(r.date) + '</span>' +
+      '<div class="track" role="img" aria-label="' + r.date + ': збито ' + hit + ' з ' + launched + '">' +
+        '<span class="seg" style="width:' + w(hit) + ';background:#2f7d5f"></span>' +
+        '<span class="seg" style="width:' + w(launched-hit) + ';background:#b8bfc8"></span>' +
+      '</div>' +
+      '<span class="pct' + (rate < 70 ? " low" : "") + '">' + rate + '%</span>' +
+      '<span class="src">' + (r.src || "д") + '</span>' +
+    '</div>';
+  }).join("");
+}
+
+/* ---------- керування ---------- */
+document.querySelectorAll(".range button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".range button").forEach(b => b.removeAttribute("aria-pressed"));
+    btn.setAttribute("aria-pressed", "true");
+    render(Number(btn.dataset.range));
+  });
+});
+
+$("btn-fetch").addEventListener("click", refresh);
+
+$("btn-parse").addEventListener("click", () => {
+  const r = parseReport($("paste").value);
+  if (r.date) $("f-date").value = r.date;
+  $("f-ml").value = r.ml; $("f-mi").value = r.mi;
+  $("f-dl").value = r.dl; $("f-di").value = r.di;
+  const st = $("status");
+  st.className = "status";
+  st.textContent = r.date ? "Розпізнано. Перевірте цифри й натисніть «Додати добу»."
+                          : "Дату не знайдено — впишіть її вручну.";
+});
+
+$("btn-add").addEventListener("click", () => {
+  const date = $("f-date").value;
+  const st = $("status");
+  if (!date) { st.className = "status err"; st.textContent = "Спершу вкажіть дату."; return; }
+  const rec = { date, ml:+$("f-ml").value||0, mi:+$("f-mi").value||0,
+                dl:+$("f-dl").value||0, di:+$("f-di").value||0, src:"з" };
+  const map = new Map(load().map(r => [r.date, r]));
+  map.set(date, rec);
+  const rows = [...map.values()].sort((a,b) => a.date.localeCompare(b.date));
+  const stored = save(rows);
+  st.className = "status ok";
+  st.textContent = "Додано " + date + (stored ? "." : ". Сховище недоступне — збережіть JSON.");
+  $("paste").value = "";
+  render(current);
+});
+
+$("btn-export").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(load(), null, 1)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "ppo-data.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+render(30);
+</script>
+</body>
+</html>
