@@ -16,11 +16,11 @@ events = F.clean_events(pd.read_csv(DATA / "events.csv"))
 forces = pd.read_csv(DATA / "forces.csv")
 dmin, dmax = events["date"].min().date(), events["date"].max().date()
 
-CARD = {"background": "#f1f5f9", "borderRadius": "8px", "padding": "10px 14px", "flex": "1", "minWidth": "150px"}
+CARD = {"background": F.SAND_LIGHT, "borderLeft": "4px solid #556B2F", "borderRadius": "8px", "padding": "10px 14px", "flex": "1", "minWidth": "150px"}
 app = Dash(__name__, title="Оперативний огляд обстановки")
 app.layout = html.Div(style={"fontFamily": "Segoe UI, Arial, sans-serif", "padding": "12px 18px", "maxWidth": "1500px",
                              "margin": "0 auto"}, children=[
-    html.H2("Дашборд оперативного огляду обстановки", style={"margin": "0 0 2px 0"}),
+    html.H2("Дашборд оперативного огляду обстановки", style={"margin": "0 0 2px 0", "color": F.OLIVE_DARK}),
     html.Div("Навчальний прототип · синтетичні дані · умовний район 60×40 км", style={"color": "#6c757d"}),
     html.Div(style={"display": "flex", "gap": "14px", "margin": "12px 0", "flexWrap": "wrap"}, children=[
         html.Div([html.Label("Напрямки"), dcc.Dropdown(F.DIRECTIONS, F.DIRECTIONS, multi=True, id="dir")],
@@ -41,10 +41,10 @@ app.layout = html.Div(style={"fontFamily": "Segoe UI, Arial, sans-serif", "paddi
     ]),
     html.H4("Журнал подій (останні 15 за фільтром)"),
     dash_table.DataTable(id="table", page_size=15, sort_action="native",
-                         style_header={"backgroundColor": "#1d3557", "color": "white", "fontWeight": "bold"},
+                         style_header={"backgroundColor": F.OLIVE_DARK, "color": "white", "fontWeight": "bold"},
                          style_cell={"textAlign": "left", "padding": "4px 8px"},
                          style_data_conditional=[{"if": {"filter_query": "{Інтенсивність} >= 4"},
-                                                  "backgroundColor": "#fde2e1"}]),
+                                                  "backgroundColor": F.HOSTILE_TINT}]),
 ])
 
 

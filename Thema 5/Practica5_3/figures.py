@@ -12,10 +12,15 @@ DIRECTIONS = ["Напрямок А", "Напрямок Б", "Напрямок В
 EVENT_TYPES = ["Артобстріл", "Удар БпЛА", "Штурмові дії", "Дії ДРГ", "Авіаудар (КАБ)"]
 UNIT_TYPES = ["Мотострілецькі", "Танкові", "Артилерійські", "Підрозділи БпЛА", "РЕБ", "Логістичні"]
 
+# Палітра військового стилю (вимога 4.2 методики): NATO blue, олива, земляні відтінки.
+# Напрямки: холодні тони (сині/оливкові/сірі); типи подій: теплі земляні тони,
+# найнебезпечніші дії (штурм) виділено темно-червоним (у NATO червоний означає противника).
+OLIVE_DARK, SAND_LIGHT, HOSTILE_TINT = "#3B4A2F", "#EEF0E6", "#EBCFC8"
 # Сталі кольори: той самий напрямок або тип події має той самий колір на всіх графіках
-DIR_COLORS = dict(zip(DIRECTIONS, ["#1f77b4", "#d62728", "#2ca02c", "#9467bd"]))
-TYPE_COLORS = dict(zip(EVENT_TYPES, ["#e76f51", "#f4a261", "#9d0208", "#6c757d", "#264653"]))
+DIR_COLORS = dict(zip(DIRECTIONS, ["#1F4E79", "#556B2F", "#6C8EBF", "#8C8C7A"]))
+TYPE_COLORS = dict(zip(EVENT_TYPES, ["#A0522D", "#C2A36B", "#8B1A1A", "#6F4E37", "#2F2F28"]))
 TEMPLATE = "plotly_white"
+FONT = dict(family="Segoe UI, Arial, sans-serif", color="#2B2B24")
 
 
 # ---------------------------------------------------------------- data
@@ -95,6 +100,11 @@ def kpis(ev):
 
 
 # ---------------------------------------------------------------- figures
+def _style(fig):
+    fig.update_layout(font=FONT, title_font=dict(color=OLIVE_DARK, size=16))
+    return fig
+
+
 def fig_map(ev):
     fig = px.scatter(ev, x="x_km", y="y_km", color="event_type", size="intensity", size_max=13,
                      color_discrete_map=TYPE_COLORS, category_orders={"event_type": EVENT_TYPES},
@@ -111,7 +121,7 @@ def fig_map(ev):
     fig.update_layout(title="Карта подій (умовний район 60×40 км)", legend_title_text="",
                       xaxis=dict(range=[0, 60]), yaxis=dict(range=[0, 40], scaleanchor="x"),
                       margin=dict(l=40, r=10, t=50, b=40))
-    return fig
+    return _style(fig)
 
 
 def fig_timeseries(ev):
@@ -127,18 +137,18 @@ def fig_timeseries(ev):
     fig.update_layout(title="Динаміка подій за напрямками<br><sup>тонка лінія: за добу; товста: ковзне середнє за 3 доби</sup>",
                       xaxis=dict(title="", tickformat="%d.%m"), yaxis_title="Подій за добу", template=TEMPLATE, hovermode="x unified",
                       legend=dict(orientation="h", y=1.0, x=0, yanchor="bottom"), margin=dict(l=40, r=10, t=90, b=30))
-    return fig
+    return _style(fig)
 
 
 def fig_forces(forces, directions=None):
     f = forces if not directions else forces[forces["direction"].isin(directions)]
     fig = px.treemap(f, path=[px.Constant("Угруповання противника"), "direction", "unit_type"], values="units",
-                     color="direction", color_discrete_map={**DIR_COLORS, "(?)": "#ced4da"}, template=TEMPLATE)
+                     color="direction", color_discrete_map={**DIR_COLORS, "(?)": "#D9D6C7"}, template=TEMPLATE)
     fig.update_traces(texttemplate="<b>%{label}</b><br>%{value} підрозд.<br>%{percentParent:.0%}",
                       hovertemplate="%{label}: %{value} підрозділів (%{percentParent:.0%} від %{parent})<extra></extra>")
     fig.update_layout(title="Структура сил противника (кількість підрозділів рівня рота/батарея)",
                       margin=dict(l=10, r=10, t=50, b=10))
-    return fig
+    return _style(fig)
 
 
 def fig_types(ev):
@@ -148,7 +158,7 @@ def fig_types(ev):
                  labels={"n": "Подій", "direction": "", "event_type": "Тип події"}, template=TEMPLATE)
     fig.update_layout(title="Характер подій за напрямками", legend_title_text="", barmode="stack",
                       margin=dict(l=10, r=10, t=50, b=30))
-    return fig
+    return _style(fig)
 
 
 def table_latest(ev, n=15):
@@ -160,9 +170,9 @@ def table_latest(ev, n=15):
 
 def fig_table(ev, n=15):
     t = table_latest(ev, n)
-    fill = [["#fde2e1" if v >= 4 else "white" for v in t["Інтенсивність"]]] * len(t.columns)
-    fig = go.Figure(go.Table(header=dict(values=[f"<b>{c}</b>" for c in t.columns], fill_color="#1d3557",
+    fill = [[HOSTILE_TINT if v >= 4 else "white" for v in t["Інтенсивність"]]] * len(t.columns)
+    fig = go.Figure(go.Table(header=dict(values=[f"<b>{c}</b>" for c in t.columns], fill_color=OLIVE_DARK,
                                          font=dict(color="white"), align="left"),
                              cells=dict(values=[t[c] for c in t.columns], fill_color=fill, align="left", height=24)))
-    fig.update_layout(title=f"Останні {n} подій (червоним: інтенсивність ≥ 4)", margin=dict(l=10, r=10, t=50, b=10))
-    return fig
+    fig.update_layout(title=f"Останні {n} подій (виділено: інтенсивність ≥ 4)", margin=dict(l=10, r=10, t=50, b=10))
+    return _style(fig)
