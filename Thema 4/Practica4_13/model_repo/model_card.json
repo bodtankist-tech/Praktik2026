@@ -1,0 +1,11 @@
+{
+  "name": "MobileNetV2 (alpha=1.0, 96x96, no top)",
+  "source": "https://github.com/JonathanCMitchell/mobilenet_v2_keras/releases/download/v1.1/mobilenet_v2_weights_tf_dim_ordering_tf_kernels_1.0_96_no_top.h5",
+  "sha256": "8b474d1d1d281884fdbae8a4ff671a6c8edbbb62605cfbf6c7e827424bf91739",
+  "pretrained_on": "ImageNet ILSVRC-2012 (1.28M images, 1000 classes)",
+  "architecture": "Sandler et al., 2018. MobileNetV2: Inverted Residuals and Linear Bottlenecks",
+  "input": "RGB float32 (96, 96, 3), preprocess: keras.applications.mobilenet_v2.preprocess_input (scale to [-1, 1])",
+  "output": "feature map (3, 3, 1280); after GlobalAveragePooling — 1280-d vector",
+  "license": "Apache 2.0 (Keras Applications)",
+  "limitations": "natural colour photos; our data are 28x28 grayscale -> domain shift (upscaling, channel replication)"
+}
