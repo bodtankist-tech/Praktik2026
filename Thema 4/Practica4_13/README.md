@@ -4,7 +4,7 @@
 |---|---|
 | 1 (індивідуальна). Transfer learning | [`4.13_1_transfer_learning.ipynb`](4.13_1_transfer_learning.ipynb) |
 | 2 (групова). RL-агент DQN | [`4.13_2_rl_dqn.ipynb`](4.13_2_rl_dqn.ipynb) |
-| Презентація результатів | 12 слайдів (обидві частини), демонструються окремо |
+| Презентація результатів (12 слайдів, обидві частини) | [`4.13_presentation.pdf`](4.13_presentation.pdf) · [`4.13_presentation.pptx`](4.13_presentation.pptx) |
 
 ## Частина 1. Transfer learning
 Модель MobileNetV2 (ImageNet) з репозиторію Keras Applications (GitHub-реліз, перевірка SHA-256, model card) адаптується до класифікації предметів речового забезпечення (Fashion-MNIST) при малій кількості розмітки.
