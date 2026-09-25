@@ -1,0 +1,6 @@
+run,model,train_acc,val_acc,val_macro_f1,gap,epochs,time_s,test_acc,selected
+B-rule,most frequent class,0.102,0.1003,,0.0018,,,,False
+B0,LogisticRegression,1.0,0.9666,0.9665,0.0334,,0.0287,0.9639,False
+D1,CNN,1.0,0.9833,0.9831,0.0167,50.0,17.5611,,False
+D2,CNN,1.0,0.9889,0.9887,0.0111,44.0,15.4189,,False
+D3,CNN,0.9991,0.9916,0.9915,0.0074,86.0,31.5623,0.9778,True

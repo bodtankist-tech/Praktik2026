@@ -1,0 +1,21 @@
+{
+  "project": "4.10 — Image classification: baseline vs CNN (sklearn digits)",
+  "seed": 42,
+  "split": {"train": 0.6, "val": 0.2, "test": 0.2, "stratify": true},
+  "baseline": {"model": "LogisticRegression", "C": 1.0, "max_iter": 5000},
+  "cnn": {
+    "conv_filters": [32, 64],
+    "dense_units": 64,
+    "optimizer": "adam",
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "max_epochs": 150,
+    "early_stopping_patience": 15
+  },
+  "runs": {
+    "D1": {"dropout": 0.0, "l2": 0.0, "augmentation": false},
+    "D2": {"dropout": 0.3, "l2": 0.0001, "augmentation": false},
+    "D3": {"dropout": 0.3, "l2": 0.0001, "augmentation": true, "aug_translation": 0.125, "aug_rotation": 0.04}
+  },
+  "domain_shift": {"gaussian_noise_std": 3.0, "shift_pixels": 1}
+}
