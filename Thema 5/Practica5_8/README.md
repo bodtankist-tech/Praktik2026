@@ -39,7 +39,7 @@ psql -U postgres -c "CREATE DATABASE rubizh_monitor;"
 bash scripts/init_db.sh         # схема
 bash scripts/seed_db.sh         # 500 тестових записів
 
-uvicorn api.main:app --reload   # API на http://localhost:8000
+uvicorn api.main:app --port 8010 --reload   # API на http://localhost:8010
 ```
 
 У другому терміналі:
@@ -71,7 +71,7 @@ psql -U postgres -c "CREATE DATABASE rubizh_monitor;"
 .\scripts\init_db.ps1
 .\scripts\seed_db.ps1
 
-uvicorn api.main:app --reload
+uvicorn api.main:app --port 8010 --reload
 ```
 
 У другому вікні:
@@ -90,7 +90,7 @@ bash scripts/smoke_test.sh        # Linux/macOS
 ```
 
 Скрипт звертається до `/health`, `/filters`, `/kpi`, `/trend` і виводить `OK`, якщо відповіді мають очікувані ключі.
-Адресу API можна змінити: `API_BASE_URL=http://host:8000`.
+Адресу API можна змінити: `API_BASE_URL=http://host:8010`.
 
 > Сторінку потрібно відкривати через `http://localhost:5500`, а не подвійним кліком (`file://`).
 > Для графіків потрібен інтернет: Chart.js підключається через CDN.
@@ -132,7 +132,7 @@ bash scripts/smoke_test.sh        # Linux/macOS
 | `GET /incidents/{id}` | повний запис, 404 якщо немає |
 | `GET /signals` | **додатково для варіанту 7**: `spikes`, `outliers`, `rules` |
 
-Інтерактивна документація: http://localhost:8000/docs.
+Інтерактивна документація: http://localhost:8010/docs.
 
 Безпека запитів: значення фільтрів передаються лише як параметри SQL, поле сортування перевіряється за білим списком,
 помилкові дати повертають 400.

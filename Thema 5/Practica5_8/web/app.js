@@ -1,7 +1,7 @@
 "use strict";
 
 // Адреса API (за вимогами завдання зафіксована в коді).
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "http://localhost:8010";
 
 /* ============ Режим аудиторії (?view=executive|analyst|demo) ============ */
 const VIEWS = ["executive", "analyst", "demo"];

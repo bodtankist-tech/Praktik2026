@@ -5,7 +5,7 @@ import sys
 import urllib.error
 import urllib.request
 
-BASE = os.getenv("API_BASE_URL", "http://localhost:8000").rstrip("/")
+BASE = os.getenv("API_BASE_URL", "http://localhost:8010").rstrip("/")
 
 
 def get(path):

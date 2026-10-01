@@ -5,7 +5,7 @@
 │  PostgreSQL  │ ◄───────────────── │  FastAPI (sync)    │ ◄─────────────── │  Web: index.html    │
 │  incidents   │                    │  api/main.py       │   fetch()        │  app.js + Chart.js  │
 └──────────────┘                    └────────────────────┘                  └─────────────────────┘
-   db/schema.sql                       http://localhost:8000                   http://localhost:5500
+   db/schema.sql                       http://localhost:8010                   http://localhost:5500
    db/seed.py
 ```
 

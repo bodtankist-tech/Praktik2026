@@ -5,7 +5,7 @@
 #
 # Що робить: знаходить psql, створює .env (пароль вводиться приховано), створює БД rubizh_monitor,
 # застосовує схему, заповнює даними (якщо порожньо), створює .venv, встановлює залежності,
-# запускає API (порт 8000) і веб (порт 5500) у окремих вікнах та відкриває дашборд.
+# запускає API (порт 8010) і веб (порт 5500) у окремих вікнах та відкриває дашборд.
 # Повторний запуск безпечний: наявні .env, база й дані не перезаписуються.
 
 $ErrorActionPreference = "Stop"
@@ -103,8 +103,8 @@ if ($count -eq "0") {
 }
 
 # 7. Запуск -------------------------------------------------------------------------------------
-Step "Запуск API (порт 8000) і веб (порт 5500)"
-Start-Window "Set-Location -LiteralPath '$root'; & '$py' -m uvicorn api.main:app --port 8000"
+Step "Запуск API (порт 8010) і веб (порт 5500)"
+Start-Window "Set-Location -LiteralPath '$root'; & '$py' -m uvicorn api.main:app --port 8010"
 Start-Window "Set-Location -LiteralPath '$root\web'; & '$py' -m http.server 5500"
 Start-Sleep -Seconds 4
 
