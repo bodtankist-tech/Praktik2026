@@ -7,3 +7,6 @@ if (Test-Path $envFile) {
         }
     }
 }
+
+# psql у Windows за замовчуванням бере кодування консолі (WIN1252) і не читає кирилицю
+$env:PGCLIENTENCODING = "UTF8"
