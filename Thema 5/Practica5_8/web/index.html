@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Рубіж-Монітор</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-view="analyst">
+
+  <header class="topbar">
+    <div>
+      <h1>Рубіж-Монітор</h1>
+      <p class="subtitle">Моніторинг змін: тренди, сигнали, зрізи за секторами. Навчальна модель, дані синтетичні.</p>
+    </div>
+    <nav class="views" aria-label="Режим для аудиторії">
+      <a href="?view=executive" data-view-link="executive">Executive</a>
+      <a href="?view=analyst" data-view-link="analyst">Analyst</a>
+      <a href="?view=demo" data-view-link="demo">Demo</a>
+    </nav>
+  </header>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <main class="page">
+
+    <!-- Фільтри -->
+    <form id="filters" class="card filters" autocomplete="off">
+      <label>Від <input type="date" id="f-from"></label>
+      <label>До <input type="date" id="f-to"></label>
+      <label>Сектор <select id="f-sector"><option value="">Усі</option></select></label>
+      <label>Напрямок <select id="f-direction"><option value="">Усі</option></select></label>
+      <label>Тип події <select id="f-type"><option value="">Усі</option></select></label>
+      <label>Мін. інтенсивність <input type="number" id="f-min" min="1" max="50" placeholder="1–50"></label>
+      <div class="filter-actions">
+        <button type="submit" class="btn primary">Apply</button>
+        <button type="button" id="f-reset" class="btn">Скинути</button>
+      </div>
+    </form>
+
+    <!-- KPI -->
+    <section class="kpis" id="kpis" aria-label="Ключові показники">
+      <article class="kpi"><span class="kpi-label">Подій</span><strong id="kpi-total">–</strong></article>
+      <article class="kpi"><span class="kpi-label">Сумарна інтенсивність</span><strong id="kpi-sum">–</strong></article>
+      <article class="kpi"><span class="kpi-label">Середня інтенсивність</span><strong id="kpi-avg">–</strong></article>
+      <article class="kpi"><span class="kpi-label">Головний напрямок</span><strong id="kpi-top" class="kpi-text">–</strong></article>
+    </section>
+
+    <!-- Інсайт (лише executive) -->
+    <section class="card insight only-executive" id="insight-card">
+      <h2>Короткий висновок</h2>
+      <p id="insight-text">Завантаження…</p>
+    </section>
+
+    <!-- Тренд -->
+    <section class="card" id="trend-card">
+      <div class="card-head">
+        <h2>Динаміка подій</h2>
+        <label class="inline">Крок
+          <select id="trend-group">
+            <option value="day">доба</option>
+            <option value="week">тиждень</option>
+          </select>
+        </label>
+      </div>
+      <div class="chart-box tall"><canvas id="chart-trend"></canvas></div>
+      <p class="hint hide-executive">Червоні точки на графіку (крок «доба»): сигнали стрибків.</p>
+    </section>
+
+    <!-- Розподіли -->
+    <section class="grid2 hide-executive" id="dist-cards">
+      <article class="card">
+        <h2>За напрямками</h2>
+        <div class="chart-box"><canvas id="chart-directions"></canvas></div>
+      </article>
+      <article class="card">
+        <h2>За типами подій</h2>
+        <div class="chart-box"><canvas id="chart-types"></canvas></div>
+      </article>
+    </section>
+
+    <!-- Сигнали -->
+    <section class="card hide-executive" id="signals-card">
+      <h2>Сигнали</h2>
+      <div class="grid2 signals">
+        <div>
+          <h3>Стрибки кількості подій</h3>
+          <ul id="signals-spikes" class="signal-list"></ul>
+        </div>
+        <div>
+          <h3>Нетипова інтенсивність <small id="outlier-threshold"></small></h3>
+          <ul id="signals-outliers" class="signal-list"></ul>
+        </div>
+      </div>
+      <p class="hint" id="signals-rules"></p>
+    </section>
+
+    <!-- Heatmap -->
+    <section class="card hide-executive" id="heatmap-card">
+      <h2>Сектор × тиждень (кількість подій)</h2>
+      <div class="table-wrap"><table id="heatmap" class="heatmap"></table></div>
+    </section>
+
+    <!-- Таблиця інцидентів (лише analyst) -->
+    <section class="card only-analyst" id="incidents-card">
+      <div class="card-head">
+        <h2>Події</h2>
+        <span id="incidents-count" class="hint"></span>
+      </div>
+      <div class="table-wrap">
+        <table id="incidents-table" class="data">
+          <thead>
+            <tr>
+              <th data-sort="occurred_at">Час</th>
+              <th data-sort="sector">Сектор</th>
+              <th data-sort="direction">Напрямок</th>
+              <th data-sort="event_type">Тип</th>
+              <th data-sort="intensity" class="num">Інтенсивність</th>
+              <th class="source-field">Джерело</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <button type="button" id="pg-prev" class="btn">← Назад</button>
+        <span id="pg-info"></span>
+        <button type="button" id="pg-next" class="btn">Далі →</button>
+      </div>
+    </section>
+
+  </main>
+
+  <dialog id="modal">
+    <form method="dialog" class="modal-inner">
+      <h2>Подія <span id="m-id"></span></h2>
+      <dl id="m-body"></dl>
+      <button class="btn primary">Закрити</button>
+    </form>
+  </dialog>
+
+  <footer class="footer">Рубіж-Монітор · навчальний проєкт · PostgreSQL → FastAPI → Web</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
