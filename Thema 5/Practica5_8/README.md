@@ -50,7 +50,17 @@ cd web && python3 -m http.server 5500
 
 Відкрити http://localhost:5500.
 
-### Windows (PowerShell)
+### Windows: одним скриптом (після встановлення PostgreSQL)
+
+1. Встановіть PostgreSQL з postgresql.org/download/windows (залишіть «Command Line Tools», порт 5432, запишіть пароль користувача `postgres`) і Python 3.10+.
+2. У терміналі VS Code відкрийте папку проєкту (`Practica5_8`) і виконайте:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File .\scripts\setup_windows.ps1
+   ```
+Скрипт сам створить `.env` (запитає пароль приховано), базу, схему й дані, `.venv`, запустить API та веб і відкриє дашборд.
+Повторний запуск безпечний: наявні `.env`, база й дані не перезаписуються.
+
+### Windows (PowerShell): вручну
 
 ```powershell
 python -m venv .venv; .\.venv\Scripts\Activate.ps1
