@@ -1,4 +1,4 @@
-# Допоміжний файл: читає .env у змінні середовища поточного процесу PowerShell.
+﻿# Допоміжний файл: читає .env у змінні середовища поточного процесу PowerShell.
 $envFile = Join-Path (Join-Path $PSScriptRoot "..") ".env"
 if (Test-Path $envFile) {
     Get-Content $envFile | ForEach-Object {

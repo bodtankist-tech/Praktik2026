@@ -1,4 +1,4 @@
-# Рубіж-Монітор: одноразове налаштування й запуск на Windows (після встановлення PostgreSQL).
+﻿# Рубіж-Монітор: одноразове налаштування й запуск на Windows (після встановлення PostgreSQL).
 #
 # Запуск із кореня проєкту (папка Practica5_8):
 #   powershell -ExecutionPolicy Bypass -File .\scripts\setup_windows.ps1

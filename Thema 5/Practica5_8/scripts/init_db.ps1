@@ -1,4 +1,4 @@
-# Застосовує db\schema.sql до бази з DATABASE_URL (.env у корені проєкту).
+﻿# Застосовує db\schema.sql до бази з DATABASE_URL (.env у корені проєкту).
 $ErrorActionPreference = "Stop"
 Set-Location (Join-Path $PSScriptRoot "..")
 . "$PSScriptRoot\_env.ps1"
