@@ -20,7 +20,7 @@
 |---|---|
 | [4.3](Thema%204/Practica4_3/4.3task.ipynb) | Практична робота 4.3: підготовка та перевірка даних |
 | [4.5](Thema%204/Practica4_5/4.5task.ipynb) | Методи штучного інтелекту для аналізу даних (Titanic). Також [доповідь 7 про Grid Search і Randomized Search](Thema%204/Practica4_5/dopovid_7_grid_random_search/README.md) |
-| [4.8](Thema%204/Practica4_8/4.8task.ipynb) | Аналіз даних методами глибокого навчання |
+| [4.8](Thema%204/Practica4_8/4.8task.ipynb) | Аналіз даних методами глибокого навчання. Також [доповідь про штучні нейронні мережі (структура та принцип навчання) і слайд](Thema%204/Practica4_8/dopovid_2_neuronni_merezhi/README.md) |
 | [4.10](Thema%204/Practica4_10/README.md) | Глибоке навчання в індивідуальному проєкті: класифікація зображень, baseline проти CNN, аугментація та domain shift |
 | [4.13](Thema%204/Practica4_13/README.md) | Репозиторії аналітичних моделей: transfer learning (MobileNetV2) і reinforcement learning (DQN), презентація |
 
