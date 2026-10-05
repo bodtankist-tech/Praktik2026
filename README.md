@@ -13,7 +13,7 @@
 | Практика | Опис |
 |---|---|
 | [3.3](Thema%203/Practica3_3/3.3task.ipynb) | Практична робота 3.3 (ноутбук) |
-| [3.5](Thema%203/Practica3_5/3.5task.ipynb) | Практична робота 3.5 (ноутбук, набір даних у `archive/`) |
+| [3.5](Thema%203/Practica3_5/README.md) | Практична робота 3.5: аналіз набору даних з Kaggle (розв'язок `3.5task.ipynb`, дані в `archive/`) |
 
 ### Тема 4. Машинне та глибоке навчання
 | Практика | Опис |
@@ -41,4 +41,15 @@ Thema 5/      практики 5.3, 5.8
 
 ## Запуск
 
-Більшість робіт — Jupyter-ноутбуки (Python). Вимоги до окремих практик і інструкції запуску наведено в їхніх `README.md` та `requirements.txt` (наприклад, у `Thema 4/Practica4_10` і `Thema 5/Practica5_8`).
+Більшість робіт це Jupyter-ноутбуки (Python 3.10+) зі збереженими результатами: їх можна читати просто на GitHub, не запускаючи. Щоб запустити самому, потрібні такі пакети:
+
+| Роботи | Пакети |
+|---|---|
+| 3.3, 3.5, 4.3, 4.5 | `pandas`, `numpy`, `matplotlib`, `seaborn`, `scikit-learn`, `scipy` |
+| 4.8, 4.10, 4.13 | те саме + `tensorflow`; для 4.10 є [`requirements.txt`](Thema%204/Practica4_10/requirements.txt), ноутбуки запускаються по черзі `01` → `02` → `03` |
+| 5.3 | `pandas`, `numpy`, `plotly`, `kaleido` (PNG у ноутбуці), `dash` (інтерактивний `app.py`) |
+| 5.8 | `fastapi`, `uvicorn`, `psycopg2-binary`, `python-dotenv` і встановлений PostgreSQL; див. [`README`](Thema%205/Practica5_8/README.md) та [`requirements.txt`](Thema%205/Practica5_8/requirements.txt) |
+
+Окремі роботи потребують інтернету під час запуску: 4.13 (завантаження набору Fashion-MNIST і ваг MobileNetV2, якщо файлів немає), 4.5 (набір Titanic, якщо немає локальної копії), 5.3 `dashboard.html` (бібліотека Plotly).
+
+Усі дані в 5.3 і 5.8 синтетичні, район і координати умовні. Інструкції запуску окремих практик наведено в їхніх `README.md`.
