@@ -1,0 +1,497 @@
+{
+ "summary": {
+  "test_photos": 27,
+  "gallery_photos": 72,
+  "top1": 0.556,
+  "top3": 0.963,
+  "note": "тестові фото не входили в галерею; випадкове вгадування top1 = 25 % (4 зразки на клас)"
+ },
+ "test": [
+  {
+   "file": "data/clean/uav/uav_038.jpg",
+   "true": "mq1",
+   "top3": [
+    [
+     "mq9",
+     0.861
+    ],
+    [
+     "rq4",
+     0.844
+    ],
+    [
+     "mq1",
+     0.844
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/uav/uav_015.jpg",
+   "true": "mq9",
+   "top3": [
+    [
+     "rq4",
+     0.849
+    ],
+    [
+     "mq9",
+     0.834
+    ],
+    [
+     "tb2",
+     0.799
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/uav/uav_016.jpg",
+   "true": "mq9",
+   "top3": [
+    [
+     "mq9",
+     0.886
+    ],
+    [
+     "tb2",
+     0.869
+    ],
+    [
+     "mq1",
+     0.863
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/uav/uav_036.jpg",
+   "true": "rq4",
+   "top3": [
+    [
+     "mq9",
+     0.884
+    ],
+    [
+     "rq4",
+     0.858
+    ],
+    [
+     "tb2",
+     0.837
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/uav/uav_002.jpg",
+   "true": "tb2",
+   "top3": [
+    [
+     "tb2",
+     0.899
+    ],
+    [
+     "mq9",
+     0.889
+    ],
+    [
+     "mq1",
+     0.882
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/uav/uav_008.jpg",
+   "true": "tb2",
+   "top3": [
+    [
+     "mq9",
+     0.899
+    ],
+    [
+     "mq1",
+     0.898
+    ],
+    [
+     "rq4",
+     0.883
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/uav/uav_032.jpg",
+   "true": "rq4",
+   "top3": [
+    [
+     "rq4",
+     0.883
+    ],
+    [
+     "tb2",
+     0.85
+    ],
+    [
+     "mq9",
+     0.846
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/armor/armor_041.jpg",
+   "true": "abrams",
+   "top3": [
+    [
+     "t72",
+     0.916
+    ],
+    [
+     "abrams",
+     0.914
+    ],
+    [
+     "leopard2",
+     0.908
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/armor/armor_006.jpg",
+   "true": "t64",
+   "top3": [
+    [
+     "t64",
+     0.844
+    ],
+    [
+     "leopard2",
+     0.836
+    ],
+    [
+     "t72",
+     0.829
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/armor/armor_037.jpg",
+   "true": "abrams",
+   "top3": [
+    [
+     "leopard2",
+     0.931
+    ],
+    [
+     "abrams",
+     0.911
+    ],
+    [
+     "t72",
+     0.888
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/armor/armor_045.jpg",
+   "true": "abrams",
+   "top3": [
+    [
+     "abrams",
+     0.895
+    ],
+    [
+     "t72",
+     0.877
+    ],
+    [
+     "leopard2",
+     0.876
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/armor/armor_010.jpg",
+   "true": "t64",
+   "top3": [
+    [
+     "t64",
+     0.887
+    ],
+    [
+     "t72",
+     0.887
+    ],
+    [
+     "leopard2",
+     0.878
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/armor/armor_033.jpg",
+   "true": "leopard2",
+   "top3": [
+    [
+     "leopard2",
+     0.91
+    ],
+    [
+     "abrams",
+     0.893
+    ],
+    [
+     "t64",
+     0.889
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/armor/armor_001.jpg",
+   "true": "t64",
+   "top3": [
+    [
+     "t64",
+     0.929
+    ],
+    [
+     "t72",
+     0.898
+    ],
+    [
+     "leopard2",
+     0.878
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/armor/armor_009.jpg",
+   "true": "t64",
+   "top3": [
+    [
+     "t64",
+     0.916
+    ],
+    [
+     "t72",
+     0.885
+    ],
+    [
+     "leopard2",
+     0.883
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_004.jpg",
+   "true": "kraz6322",
+   "top3": [
+    [
+     "kamaz",
+     0.887
+    ],
+    [
+     "kraz6322",
+     0.864
+    ],
+    [
+     "ural4320",
+     0.846
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_043.jpg",
+   "true": "m35",
+   "top3": [
+    [
+     "m35",
+     0.93
+    ],
+    [
+     "ural4320",
+     0.9
+    ],
+    [
+     "kraz6322",
+     0.87
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_039.jpg",
+   "true": "m35",
+   "top3": [
+    [
+     "m35",
+     0.903
+    ],
+    [
+     "kamaz",
+     0.894
+    ],
+    [
+     "ural4320",
+     0.884
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_031.jpg",
+   "true": "ural4320",
+   "top3": [
+    [
+     "ural4320",
+     0.856
+    ],
+    [
+     "m35",
+     0.83
+    ],
+    [
+     "kamaz",
+     0.827
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_005.jpg",
+   "true": "kraz6322",
+   "top3": [
+    [
+     "ural4320",
+     0.932
+    ],
+    [
+     "kamaz",
+     0.923
+    ],
+    [
+     "kraz6322",
+     0.92
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_033.jpg",
+   "true": "ural4320",
+   "top3": [
+    [
+     "kamaz",
+     0.88
+    ],
+    [
+     "ural4320",
+     0.868
+    ],
+    [
+     "kraz6322",
+     0.854
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_006.jpg",
+   "true": "kraz6322",
+   "top3": [
+    [
+     "kraz6322",
+     0.942
+    ],
+    [
+     "m35",
+     0.941
+    ],
+    [
+     "kamaz",
+     0.936
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_022.jpg",
+   "true": "kamaz",
+   "top3": [
+    [
+     "kamaz",
+     0.899
+    ],
+    [
+     "m35",
+     0.898
+    ],
+    [
+     "kraz6322",
+     0.892
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_023.jpg",
+   "true": "kamaz",
+   "top3": [
+    [
+     "kamaz",
+     0.933
+    ],
+    [
+     "kraz6322",
+     0.921
+    ],
+    [
+     "m35",
+     0.918
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_026.jpg",
+   "true": "ural4320",
+   "top3": [
+    [
+     "m35",
+     0.931
+    ],
+    [
+     "ural4320",
+     0.927
+    ],
+    [
+     "kamaz",
+     0.895
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_003.jpg",
+   "true": "kraz6322",
+   "top3": [
+    [
+     "ural4320",
+     0.933
+    ],
+    [
+     "kraz6322",
+     0.932
+    ],
+    [
+     "kamaz",
+     0.926
+    ]
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_009.jpg",
+   "true": "kraz6322",
+   "top3": [
+    [
+     "kamaz",
+     0.948
+    ],
+    [
+     "kraz6322",
+     0.944
+    ],
+    [
+     "m35",
+     0.938
+    ]
+   ]
+  }
+ ]
+}
