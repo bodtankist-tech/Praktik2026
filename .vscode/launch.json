@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Розпізнавач техніки (4.13)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/Thema 4/Practica4_13_classifier/app.py",
+            "cwd": "${workspaceFolder}/Thema 4/Practica4_13_classifier",
+            "python": "${env:LOCALAPPDATA}\\Programs\\Python\\Python312\\python.exe",
+            "console": "internalConsole",
+            "justMyCode": true
+        }
+    ]
+}

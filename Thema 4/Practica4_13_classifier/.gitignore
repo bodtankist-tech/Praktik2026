@@ -6,3 +6,4 @@ models/resnet18_fine_tuning.pt
 # Журнали запуску
 scripts/*_log.txt
 *.log
+shortcut_log.txt

@@ -1,6 +1,7 @@
 """«Розпізнавач техніки» — навчальний застосунок: фото → клас → впевненість.
 
-Запуск: python app.py   (або подвійний клік на run_app.bat)
+Запуск: ярлик «Розпізнавач техніки» на робочому столі, подвійний клік на run_app.bat,
+або в VS Code: Run ▶ (F5) → «Розпізнавач техніки (4.13)».
 Кнопка «Відкрити фото» — вибрати власний знімок; «Наступний приклад» — перегорнути
 знімки з тестового та «складного» наборів, які модель не бачила під час навчання.
 """
@@ -9,7 +10,7 @@ import json
 import sys
 import tkinter as tk
 from pathlib import Path
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 
 import torch
 from PIL import Image, ImageTk
@@ -26,7 +27,7 @@ except Exception:
 BG, PANEL, FG, MUTED = "#151a14", "#1f261d", "#e9eee4", "#9aa58f"
 COLORS = {"uav": "#5aa9e6", "armor": "#c9a227", "truck": "#7fb069"}
 
-model = load_trained()
+model = None  # завантажується після появи вікна (див. нижче)
 split = json.load(open(ROOT / "data" / "split.json"))
 examples = [ROOT / f for f, _ in split["test"]]
 examples += sorted((ROOT / "data" / "challenge").rglob("*.jpg"))
@@ -75,6 +76,10 @@ def next_example():
 root = tk.Tk()
 root.title("Розпізнавач техніки · ResNet18 transfer learning")
 root.configure(bg=BG)
+try:
+    root.iconbitmap(str(ROOT / "icon.ico"))
+except Exception:
+    pass
 tk.Label(root, text="РОЗПІЗНАВАЧ ТЕХНІКИ", bg=BG, fg=FG, font=("Segoe UI", 18, "bold")).pack(pady=(14, 0))
 tk.Label(root, text="БПЛА · бронетехніка · вантажні автомобілі  |  ResNet18 (ImageNet) + новий шар на 3 класи",
          bg=BG, fg=MUTED, font=("Segoe UI", 9)).pack()
@@ -89,6 +94,17 @@ for text, cmd in [("Відкрити фото…", open_file), ("Наступн�
 src = tk.Label(root, text="", bg=BG, fg=MUTED, font=("Segoe UI", 9)); src.pack(pady=(6, 0))
 tk.Label(root, text="Навчальний проєкт НУОУ · відкриті знімки Wikimedia Commons (CC / public domain)",
          bg=BG, fg="#5f6b56", font=("Segoe UI", 8)).pack(side="bottom", pady=8)
+# Вікно з'являється одразу; модель (≈ 5–10 с) вантажиться вже при відкритому вікні
+verdict.configure(text="Завантаження моделі…", fg=MUTED)
+root.update()
+try:
+    model = load_trained()
+except Exception as e:  # pythonw не має консолі — показуємо помилку у вікні
+    messagebox.showerror("Розпізнавач техніки", f"Не вдалося завантажити модель:\n{e}\n\n"
+                         "Перевірте, що встановлено Python 3.12 з бібліотеками з requirements.txt.")
+    root.destroy(); sys.exit(1)
+verdict.configure(text="Оберіть фото", fg=FG)
+
 # Режим знімка для звіту: python app.py --snapshot <фото> <файл.png>
 if len(sys.argv) == 4 and sys.argv[1] == "--snapshot":
     from PIL import ImageGrab
