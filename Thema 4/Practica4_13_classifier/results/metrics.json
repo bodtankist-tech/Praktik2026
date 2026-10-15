@@ -1,0 +1,826 @@
+{
+ "classes": [
+  "uav",
+  "armor",
+  "truck"
+ ],
+ "split_sizes": {
+  "train": 60,
+  "val": 12,
+  "test": 27
+ },
+ "modes": {
+  "feature_extraction": {
+   "test_acc": 0.9259259259259259,
+   "best_val_acc": 0.9166666666666666,
+   "history": [
+    {
+     "epoch": 1,
+     "loss": 1.114681061108907,
+     "val_acc": 0.5
+    },
+    {
+     "epoch": 2,
+     "loss": 0.8483108083407084,
+     "val_acc": 0.5833333333333334
+    },
+    {
+     "epoch": 3,
+     "loss": 0.7100534756978353,
+     "val_acc": 0.8333333333333334
+    },
+    {
+     "epoch": 4,
+     "loss": 0.5504810810089111,
+     "val_acc": 0.9166666666666666
+    },
+    {
+     "epoch": 5,
+     "loss": 0.6331494649251302,
+     "val_acc": 0.8333333333333334
+    },
+    {
+     "epoch": 6,
+     "loss": 0.42754704554875694,
+     "val_acc": 0.8333333333333334
+    },
+    {
+     "epoch": 7,
+     "loss": 0.35555657545725505,
+     "val_acc": 0.9166666666666666
+    },
+    {
+     "epoch": 8,
+     "loss": 0.3196822722752889,
+     "val_acc": 0.9166666666666666
+    },
+    {
+     "epoch": 9,
+     "loss": 0.28819132844607037,
+     "val_acc": 0.9166666666666666
+    },
+    {
+     "epoch": 10,
+     "loss": 0.25631179014841715,
+     "val_acc": 0.9166666666666666
+    },
+    {
+     "epoch": 11,
+     "loss": 0.2347320169210434,
+     "val_acc": 0.9166666666666666
+    },
+    {
+     "epoch": 12,
+     "loss": 0.22687910993893942,
+     "val_acc": 0.9166666666666666
+    }
+   ],
+   "test_predictions": [
+    {
+     "file": "data/clean/uav/uav_038.jpg",
+     "true": "uav",
+     "pred": "uav",
+     "confidence": 0.7453810572624207
+    },
+    {
+     "file": "data/clean/uav/uav_015.jpg",
+     "true": "uav",
+     "pred": "uav",
+     "confidence": 0.687555193901062
+    },
+    {
+     "file": "data/clean/uav/uav_016.jpg",
+     "true": "uav",
+     "pred": "uav",
+     "confidence": 0.8850680589675903
+    },
+    {
+     "file": "data/clean/uav/uav_036.jpg",
+     "true": "uav",
+     "pred": "uav",
+     "confidence": 0.6794378161430359
+    },
+    {
+     "file": "data/clean/uav/uav_002.jpg",
+     "true": "uav",
+     "pred": "uav",
+     "confidence": 0.9432293176651001
+    },
+    {
+     "file": "data/clean/uav/uav_008.jpg",
+     "true": "uav",
+     "pred": "uav",
+     "confidence": 0.8869162201881409
+    },
+    {
+     "file": "data/clean/uav/uav_032.jpg",
+     "true": "uav",
+     "pred": "uav",
+     "confidence": 0.7054744362831116
+    },
+    {
+     "file": "data/clean/armor/armor_041.jpg",
+     "true": "armor",
+     "pred": "armor",
+     "confidence": 0.7971765398979187
+    },
+    {
+     "file": "data/clean/armor/armor_006.jpg",
+     "true": "armor",
+     "pred": "armor",
+     "confidence": 0.6560521721839905
+    },
+    {
+     "file": "data/clean/armor/armor_037.jpg",
+     "true": "armor",
+     "pred": "armor",
+     "confidence": 0.7655872106552124
+    },
+    {
+     "file": "data/clean/armor/armor_045.jpg",
+     "true": "armor",
+     "pred": "armor",
+     "confidence": 0.6252476572990417
+    },
+    {
+     "file": "data/clean/armor/armor_010.jpg",
+     "true": "armor",
+     "pred": "armor",
+     "confidence": 0.552604079246521
+    },
+    {
+     "file": "data/clean/armor/armor_033.jpg",
+     "true": "armor",
+     "pred": "armor",
+     "confidence": 0.7231934070587158
+    },
+    {
+     "file": "data/clean/armor/armor_001.jpg",
+     "true": "armor",
+     "pred": "truck",
+     "confidence": 0.4761204421520233
+    },
+    {
+     "file": "data/clean/armor/armor_009.jpg",
+     "true": "armor",
+     "pred": "armor",
+     "confidence": 0.7723001837730408
+    },
+    {
+     "file": "data/clean/truck/truck_004.jpg",
+     "true": "truck",
+     "pred": "armor",
+     "confidence": 0.4226861298084259
+    },
+    {
+     "file": "data/clean/truck/truck_043.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.943463146686554
+    },
+    {
+     "file": "data/clean/truck/truck_039.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.8544490337371826
+    },
+    {
+     "file": "data/clean/truck/truck_031.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.48580288887023926
+    },
+    {
+     "file": "data/clean/truck/truck_005.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.8993499279022217
+    },
+    {
+     "file": "data/clean/truck/truck_033.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.5029897093772888
+    },
+    {
+     "file": "data/clean/truck/truck_006.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.9909752011299133
+    },
+    {
+     "file": "data/clean/truck/truck_022.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.9457597136497498
+    },
+    {
+     "file": "data/clean/truck/truck_023.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.9070274233818054
+    },
+    {
+     "file": "data/clean/truck/truck_026.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.9207737445831299
+    },
+    {
+     "file": "data/clean/truck/truck_003.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.8816626071929932
+    },
+    {
+     "file": "data/clean/truck/truck_009.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.9673993587493896
+    }
+   ]
+  },
+  "fine_tuning": {
+   "test_acc": 1.0,
+   "best_val_acc": 1.0,
+   "history": [
+    {
+     "epoch": 1,
+     "loss": 0.9645539283752441,
+     "val_acc": 0.8333333333333334
+    },
+    {
+     "epoch": 2,
+     "loss": 0.234645015001297,
+     "val_acc": 1.0
+    },
+    {
+     "epoch": 3,
+     "loss": 0.11569389427701632,
+     "val_acc": 1.0
+    },
+    {
+     "epoch": 4,
+     "loss": 0.04357328390081724,
+     "val_acc": 1.0
+    },
+    {
+     "epoch": 5,
+     "loss": 0.20996709018945695,
+     "val_acc": 1.0
+    },
+    {
+     "epoch": 6,
+     "loss": 0.012351731583476067,
+     "val_acc": 1.0
+    },
+    {
+     "epoch": 7,
+     "loss": 0.007656393945217133,
+     "val_acc": 1.0
+    },
+    {
+     "epoch": 8,
+     "loss": 0.006817885860800743,
+     "val_acc": 1.0
+    },
+    {
+     "epoch": 9,
+     "loss": 0.015433620785673459,
+     "val_acc": 1.0
+    },
+    {
+     "epoch": 10,
+     "loss": 0.010381243874629338,
+     "val_acc": 1.0
+    },
+    {
+     "epoch": 11,
+     "loss": 0.010251147315527002,
+     "val_acc": 1.0
+    },
+    {
+     "epoch": 12,
+     "loss": 0.0045513133828838665,
+     "val_acc": 1.0
+    }
+   ],
+   "test_predictions": [
+    {
+     "file": "data/clean/uav/uav_038.jpg",
+     "true": "uav",
+     "pred": "uav",
+     "confidence": 0.9955761432647705
+    },
+    {
+     "file": "data/clean/uav/uav_015.jpg",
+     "true": "uav",
+     "pred": "uav",
+     "confidence": 0.999409556388855
+    },
+    {
+     "file": "data/clean/uav/uav_016.jpg",
+     "true": "uav",
+     "pred": "uav",
+     "confidence": 0.9995425939559937
+    },
+    {
+     "file": "data/clean/uav/uav_036.jpg",
+     "true": "uav",
+     "pred": "uav",
+     "confidence": 0.9993438124656677
+    },
+    {
+     "file": "data/clean/uav/uav_002.jpg",
+     "true": "uav",
+     "pred": "uav",
+     "confidence": 0.9989263415336609
+    },
+    {
+     "file": "data/clean/uav/uav_008.jpg",
+     "true": "uav",
+     "pred": "uav",
+     "confidence": 0.999087929725647
+    },
+    {
+     "file": "data/clean/uav/uav_032.jpg",
+     "true": "uav",
+     "pred": "uav",
+     "confidence": 0.9992005228996277
+    },
+    {
+     "file": "data/clean/armor/armor_041.jpg",
+     "true": "armor",
+     "pred": "armor",
+     "confidence": 0.9749425053596497
+    },
+    {
+     "file": "data/clean/armor/armor_006.jpg",
+     "true": "armor",
+     "pred": "armor",
+     "confidence": 0.7133474349975586
+    },
+    {
+     "file": "data/clean/armor/armor_037.jpg",
+     "true": "armor",
+     "pred": "armor",
+     "confidence": 0.9963364601135254
+    },
+    {
+     "file": "data/clean/armor/armor_045.jpg",
+     "true": "armor",
+     "pred": "armor",
+     "confidence": 0.9488849639892578
+    },
+    {
+     "file": "data/clean/armor/armor_010.jpg",
+     "true": "armor",
+     "pred": "armor",
+     "confidence": 0.9676668643951416
+    },
+    {
+     "file": "data/clean/armor/armor_033.jpg",
+     "true": "armor",
+     "pred": "armor",
+     "confidence": 0.9913665652275085
+    },
+    {
+     "file": "data/clean/armor/armor_001.jpg",
+     "true": "armor",
+     "pred": "armor",
+     "confidence": 0.8953856229782104
+    },
+    {
+     "file": "data/clean/armor/armor_009.jpg",
+     "true": "armor",
+     "pred": "armor",
+     "confidence": 0.981036901473999
+    },
+    {
+     "file": "data/clean/truck/truck_004.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.7019506096839905
+    },
+    {
+     "file": "data/clean/truck/truck_043.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.9954138398170471
+    },
+    {
+     "file": "data/clean/truck/truck_039.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.9982819557189941
+    },
+    {
+     "file": "data/clean/truck/truck_031.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.5877646803855896
+    },
+    {
+     "file": "data/clean/truck/truck_005.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.9968693852424622
+    },
+    {
+     "file": "data/clean/truck/truck_033.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.7644338607788086
+    },
+    {
+     "file": "data/clean/truck/truck_006.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.9991281628608704
+    },
+    {
+     "file": "data/clean/truck/truck_022.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.9864519834518433
+    },
+    {
+     "file": "data/clean/truck/truck_023.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.997670590877533
+    },
+    {
+     "file": "data/clean/truck/truck_026.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.9960314631462097
+    },
+    {
+     "file": "data/clean/truck/truck_003.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.9979616403579712
+    },
+    {
+     "file": "data/clean/truck/truck_009.jpg",
+     "true": "truck",
+     "pred": "truck",
+     "confidence": 0.9962953925132751
+    }
+   ]
+  }
+ },
+ "selected_mode": "fine_tuning",
+ "test_accuracy": 1.0,
+ "confusion_matrix": [
+  [
+   7,
+   0,
+   0
+  ],
+  [
+   0,
+   8,
+   0
+  ],
+  [
+   0,
+   0,
+   12
+  ]
+ ],
+ "report": {
+  "uav": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1-score": 1.0,
+   "support": 7.0
+  },
+  "armor": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1-score": 1.0,
+   "support": 8.0
+  },
+  "truck": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1-score": 1.0,
+   "support": 12.0
+  },
+  "accuracy": 1.0,
+  "macro avg": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1-score": 1.0,
+   "support": 27.0
+  },
+  "weighted avg": {
+   "precision": 1.0,
+   "recall": 1.0,
+   "f1-score": 1.0,
+   "support": 27.0
+  }
+ },
+ "test_predictions": [
+  {
+   "file": "data/clean/uav/uav_038.jpg",
+   "true": "uav",
+   "pred": "uav",
+   "confidence": 0.9955761432647705,
+   "probs": [
+    0.9955761432647705,
+    0.0039037582464516163,
+    0.0005200289888307452
+   ]
+  },
+  {
+   "file": "data/clean/uav/uav_015.jpg",
+   "true": "uav",
+   "pred": "uav",
+   "confidence": 0.999409556388855,
+   "probs": [
+    0.999409556388855,
+    0.00033939292188733816,
+    0.0002510713820811361
+   ]
+  },
+  {
+   "file": "data/clean/uav/uav_016.jpg",
+   "true": "uav",
+   "pred": "uav",
+   "confidence": 0.9995425939559937,
+   "probs": [
+    0.9995425939559937,
+    0.0003924321208614856,
+    6.511184619739652e-05
+   ]
+  },
+  {
+   "file": "data/clean/uav/uav_036.jpg",
+   "true": "uav",
+   "pred": "uav",
+   "confidence": 0.9993438124656677,
+   "probs": [
+    0.9993438124656677,
+    0.0006482500466518104,
+    8.034988240979146e-06
+   ]
+  },
+  {
+   "file": "data/clean/uav/uav_002.jpg",
+   "true": "uav",
+   "pred": "uav",
+   "confidence": 0.9989263415336609,
+   "probs": [
+    0.9989263415336609,
+    0.0010030611883848906,
+    7.065555109875277e-05
+   ]
+  },
+  {
+   "file": "data/clean/uav/uav_008.jpg",
+   "true": "uav",
+   "pred": "uav",
+   "confidence": 0.999087929725647,
+   "probs": [
+    0.999087929725647,
+    0.0005377462948672473,
+    0.0003743832930922508
+   ]
+  },
+  {
+   "file": "data/clean/uav/uav_032.jpg",
+   "true": "uav",
+   "pred": "uav",
+   "confidence": 0.9992005228996277,
+   "probs": [
+    0.9992005228996277,
+    0.0006353796925395727,
+    0.0001641512499190867
+   ]
+  },
+  {
+   "file": "data/clean/armor/armor_041.jpg",
+   "true": "armor",
+   "pred": "armor",
+   "confidence": 0.9749425053596497,
+   "probs": [
+    0.023658212274312973,
+    0.9749425053596497,
+    0.00139937165658921
+   ]
+  },
+  {
+   "file": "data/clean/armor/armor_006.jpg",
+   "true": "armor",
+   "pred": "armor",
+   "confidence": 0.7133474349975586,
+   "probs": [
+    0.20288413763046265,
+    0.7133474349975586,
+    0.08376838266849518
+   ]
+  },
+  {
+   "file": "data/clean/armor/armor_037.jpg",
+   "true": "armor",
+   "pred": "armor",
+   "confidence": 0.9963364601135254,
+   "probs": [
+    0.002282931236550212,
+    0.9963364601135254,
+    0.0013806500937789679
+   ]
+  },
+  {
+   "file": "data/clean/armor/armor_045.jpg",
+   "true": "armor",
+   "pred": "armor",
+   "confidence": 0.9488849639892578,
+   "probs": [
+    0.027195921167731285,
+    0.9488849639892578,
+    0.023919152095913887
+   ]
+  },
+  {
+   "file": "data/clean/armor/armor_010.jpg",
+   "true": "armor",
+   "pred": "armor",
+   "confidence": 0.9676668643951416,
+   "probs": [
+    0.029961494728922844,
+    0.9676668643951416,
+    0.0023717426229268312
+   ]
+  },
+  {
+   "file": "data/clean/armor/armor_033.jpg",
+   "true": "armor",
+   "pred": "armor",
+   "confidence": 0.9913665652275085,
+   "probs": [
+    0.000924297550227493,
+    0.9913665652275085,
+    0.0077091120183467865
+   ]
+  },
+  {
+   "file": "data/clean/armor/armor_001.jpg",
+   "true": "armor",
+   "pred": "armor",
+   "confidence": 0.8953856229782104,
+   "probs": [
+    0.003953622654080391,
+    0.8953856229782104,
+    0.10066087543964386
+   ]
+  },
+  {
+   "file": "data/clean/armor/armor_009.jpg",
+   "true": "armor",
+   "pred": "armor",
+   "confidence": 0.981036901473999,
+   "probs": [
+    0.014207455329596996,
+    0.981036901473999,
+    0.004755725152790546
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_004.jpg",
+   "true": "truck",
+   "pred": "truck",
+   "confidence": 0.7019506096839905,
+   "probs": [
+    0.06360601633787155,
+    0.23444338142871857,
+    0.7019506096839905
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_043.jpg",
+   "true": "truck",
+   "pred": "truck",
+   "confidence": 0.9954138398170471,
+   "probs": [
+    0.0008047940209507942,
+    0.0037814429961144924,
+    0.9954138398170471
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_039.jpg",
+   "true": "truck",
+   "pred": "truck",
+   "confidence": 0.9982819557189941,
+   "probs": [
+    0.0013546523405238986,
+    0.0003634026215877384,
+    0.9982819557189941
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_031.jpg",
+   "true": "truck",
+   "pred": "truck",
+   "confidence": 0.5877646803855896,
+   "probs": [
+    0.08611784130334854,
+    0.32611751556396484,
+    0.5877646803855896
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_005.jpg",
+   "true": "truck",
+   "pred": "truck",
+   "confidence": 0.9968693852424622,
+   "probs": [
+    0.0018833954818546772,
+    0.0012472434900701046,
+    0.9968693852424622
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_033.jpg",
+   "true": "truck",
+   "pred": "truck",
+   "confidence": 0.7644338607788086,
+   "probs": [
+    0.02279769815504551,
+    0.21276845037937164,
+    0.7644338607788086
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_006.jpg",
+   "true": "truck",
+   "pred": "truck",
+   "confidence": 0.9991281628608704,
+   "probs": [
+    0.0006574205472134054,
+    0.00021447124890983105,
+    0.9991281628608704
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_022.jpg",
+   "true": "truck",
+   "pred": "truck",
+   "confidence": 0.9864519834518433,
+   "probs": [
+    0.01058338675647974,
+    0.0029646705370396376,
+    0.9864519834518433
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_023.jpg",
+   "true": "truck",
+   "pred": "truck",
+   "confidence": 0.997670590877533,
+   "probs": [
+    0.0020979479886591434,
+    0.00023144583974499255,
+    0.997670590877533
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_026.jpg",
+   "true": "truck",
+   "pred": "truck",
+   "confidence": 0.9960314631462097,
+   "probs": [
+    0.0019416364375501871,
+    0.00202685734257102,
+    0.9960314631462097
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_003.jpg",
+   "true": "truck",
+   "pred": "truck",
+   "confidence": 0.9979616403579712,
+   "probs": [
+    0.0012011019280180335,
+    0.0008373051532544196,
+    0.9979616403579712
+   ]
+  },
+  {
+   "file": "data/clean/truck/truck_009.jpg",
+   "true": "truck",
+   "pred": "truck",
+   "confidence": 0.9962953925132751,
+   "probs": [
+    0.003257427830249071,
+    0.0004472292202990502,
+    0.9962953925132751
+   ]
+  }
+ ],
+ "train_time_sec": 107.5
+}

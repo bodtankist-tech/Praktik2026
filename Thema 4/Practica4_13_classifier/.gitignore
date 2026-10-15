@@ -1,0 +1,8 @@
+# Сирі завантаження (відтворюються scripts/fetch_images.py); у репозиторії — очищений набір data/clean
+data/raw/
+# Проміжні ваги двох режимів (відтворюються scripts/train.py); фінальна модель — models/resnet18_vehicles.pt
+models/resnet18_feature_extraction.pt
+models/resnet18_fine_tuning.pt
+# Журнали запуску
+scripts/*_log.txt
+*.log

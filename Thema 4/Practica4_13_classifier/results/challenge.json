@@ -1,0 +1,302 @@
+{
+ "feature_extraction": {
+  "accuracy": 0.7083333333333334,
+  "n": 24,
+  "predictions": [
+   {
+    "file": "data/challenge/uav/uav_001.jpg",
+    "true": "uav",
+    "pred": "uav",
+    "confidence": 0.8087398409843445
+   },
+   {
+    "file": "data/challenge/uav/uav_003.jpg",
+    "true": "uav",
+    "pred": "truck",
+    "confidence": 0.45902225375175476
+   },
+   {
+    "file": "data/challenge/uav/uav_004.jpg",
+    "true": "uav",
+    "pred": "armor",
+    "confidence": 0.5729820728302002
+   },
+   {
+    "file": "data/challenge/uav/uav_005.jpg",
+    "true": "uav",
+    "pred": "uav",
+    "confidence": 0.8761662840843201
+   },
+   {
+    "file": "data/challenge/uav/uav_006.jpg",
+    "true": "uav",
+    "pred": "armor",
+    "confidence": 0.46075162291526794
+   },
+   {
+    "file": "data/challenge/uav/uav_007.jpg",
+    "true": "uav",
+    "pred": "uav",
+    "confidence": 0.5372087955474854
+   },
+   {
+    "file": "data/challenge/uav/uav_008.jpg",
+    "true": "uav",
+    "pred": "uav",
+    "confidence": 0.8277249336242676
+   },
+   {
+    "file": "data/challenge/uav/uav_009.jpg",
+    "true": "uav",
+    "pred": "uav",
+    "confidence": 0.8104647397994995
+   },
+   {
+    "file": "data/challenge/uav/uav_010.jpg",
+    "true": "uav",
+    "pred": "uav",
+    "confidence": 0.9367157220840454
+   },
+   {
+    "file": "data/challenge/armor/armor_001.jpg",
+    "true": "armor",
+    "pred": "truck",
+    "confidence": 0.7883013486862183
+   },
+   {
+    "file": "data/challenge/armor/armor_002.jpg",
+    "true": "armor",
+    "pred": "truck",
+    "confidence": 0.484025776386261
+   },
+   {
+    "file": "data/challenge/armor/armor_003.jpg",
+    "true": "armor",
+    "pred": "armor",
+    "confidence": 0.5560727715492249
+   },
+   {
+    "file": "data/challenge/armor/armor_004.jpg",
+    "true": "armor",
+    "pred": "armor",
+    "confidence": 0.6307068467140198
+   },
+   {
+    "file": "data/challenge/armor/armor_007.jpg",
+    "true": "armor",
+    "pred": "truck",
+    "confidence": 0.7362369894981384
+   },
+   {
+    "file": "data/challenge/armor/armor_008.jpg",
+    "true": "armor",
+    "pred": "truck",
+    "confidence": 0.6815690398216248
+   },
+   {
+    "file": "data/challenge/armor/armor_009.jpg",
+    "true": "armor",
+    "pred": "armor",
+    "confidence": 0.591558575630188
+   },
+   {
+    "file": "data/challenge/armor/armor_010.jpg",
+    "true": "armor",
+    "pred": "armor",
+    "confidence": 0.6962271332740784
+   },
+   {
+    "file": "data/challenge/truck/truck_001.jpg",
+    "true": "truck",
+    "pred": "truck",
+    "confidence": 0.9333898425102234
+   },
+   {
+    "file": "data/challenge/truck/truck_002.jpg",
+    "true": "truck",
+    "pred": "truck",
+    "confidence": 0.9079642295837402
+   },
+   {
+    "file": "data/challenge/truck/truck_003.jpg",
+    "true": "truck",
+    "pred": "truck",
+    "confidence": 0.9067906737327576
+   },
+   {
+    "file": "data/challenge/truck/truck_004.jpg",
+    "true": "truck",
+    "pred": "truck",
+    "confidence": 0.9498997926712036
+   },
+   {
+    "file": "data/challenge/truck/truck_005.jpg",
+    "true": "truck",
+    "pred": "truck",
+    "confidence": 0.904242992401123
+   },
+   {
+    "file": "data/challenge/truck/truck_006.jpg",
+    "true": "truck",
+    "pred": "truck",
+    "confidence": 0.9463317394256592
+   },
+   {
+    "file": "data/challenge/truck/truck_007.jpg",
+    "true": "truck",
+    "pred": "truck",
+    "confidence": 0.8499441742897034
+   }
+  ]
+ },
+ "fine_tuning": {
+  "accuracy": 0.875,
+  "n": 24,
+  "predictions": [
+   {
+    "file": "data/challenge/uav/uav_001.jpg",
+    "true": "uav",
+    "pred": "uav",
+    "confidence": 0.9964621663093567
+   },
+   {
+    "file": "data/challenge/uav/uav_003.jpg",
+    "true": "uav",
+    "pred": "uav",
+    "confidence": 0.767241895198822
+   },
+   {
+    "file": "data/challenge/uav/uav_004.jpg",
+    "true": "uav",
+    "pred": "armor",
+    "confidence": 0.7213413119316101
+   },
+   {
+    "file": "data/challenge/uav/uav_005.jpg",
+    "true": "uav",
+    "pred": "uav",
+    "confidence": 0.9922134280204773
+   },
+   {
+    "file": "data/challenge/uav/uav_006.jpg",
+    "true": "uav",
+    "pred": "uav",
+    "confidence": 0.5638744831085205
+   },
+   {
+    "file": "data/challenge/uav/uav_007.jpg",
+    "true": "uav",
+    "pred": "uav",
+    "confidence": 0.9832566380500793
+   },
+   {
+    "file": "data/challenge/uav/uav_008.jpg",
+    "true": "uav",
+    "pred": "uav",
+    "confidence": 0.9899623394012451
+   },
+   {
+    "file": "data/challenge/uav/uav_009.jpg",
+    "true": "uav",
+    "pred": "uav",
+    "confidence": 0.9994619488716125
+   },
+   {
+    "file": "data/challenge/uav/uav_010.jpg",
+    "true": "uav",
+    "pred": "uav",
+    "confidence": 0.9976129531860352
+   },
+   {
+    "file": "data/challenge/armor/armor_001.jpg",
+    "true": "armor",
+    "pred": "armor",
+    "confidence": 0.694145143032074
+   },
+   {
+    "file": "data/challenge/armor/armor_002.jpg",
+    "true": "armor",
+    "pred": "armor",
+    "confidence": 0.8441073298454285
+   },
+   {
+    "file": "data/challenge/armor/armor_003.jpg",
+    "true": "armor",
+    "pred": "armor",
+    "confidence": 0.600006639957428
+   },
+   {
+    "file": "data/challenge/armor/armor_004.jpg",
+    "true": "armor",
+    "pred": "armor",
+    "confidence": 0.4827536940574646
+   },
+   {
+    "file": "data/challenge/armor/armor_007.jpg",
+    "true": "armor",
+    "pred": "truck",
+    "confidence": 0.9318553805351257
+   },
+   {
+    "file": "data/challenge/armor/armor_008.jpg",
+    "true": "armor",
+    "pred": "truck",
+    "confidence": 0.9304765462875366
+   },
+   {
+    "file": "data/challenge/armor/armor_009.jpg",
+    "true": "armor",
+    "pred": "armor",
+    "confidence": 0.7838977575302124
+   },
+   {
+    "file": "data/challenge/armor/armor_010.jpg",
+    "true": "armor",
+    "pred": "armor",
+    "confidence": 0.9837787747383118
+   },
+   {
+    "file": "data/challenge/truck/truck_001.jpg",
+    "true": "truck",
+    "pred": "truck",
+    "confidence": 0.9859727621078491
+   },
+   {
+    "file": "data/challenge/truck/truck_002.jpg",
+    "true": "truck",
+    "pred": "truck",
+    "confidence": 0.9657432436943054
+   },
+   {
+    "file": "data/challenge/truck/truck_003.jpg",
+    "true": "truck",
+    "pred": "truck",
+    "confidence": 0.9978006482124329
+   },
+   {
+    "file": "data/challenge/truck/truck_004.jpg",
+    "true": "truck",
+    "pred": "truck",
+    "confidence": 0.9890025854110718
+   },
+   {
+    "file": "data/challenge/truck/truck_005.jpg",
+    "true": "truck",
+    "pred": "truck",
+    "confidence": 0.9930381178855896
+   },
+   {
+    "file": "data/challenge/truck/truck_006.jpg",
+    "true": "truck",
+    "pred": "truck",
+    "confidence": 0.9897747039794922
+   },
+   {
+    "file": "data/challenge/truck/truck_007.jpg",
+    "true": "truck",
+    "pred": "truck",
+    "confidence": 0.963370144367218
+   }
+  ]
+ }
+}
