@@ -23,6 +23,7 @@
 | [4.8](Thema%204/Practica4_8/4.8task.ipynb) | Аналіз даних методами глибокого навчання. Також [доповідь про штучні нейронні мережі (структура та принцип навчання) і слайд](Thema%204/Practica4_8/dopovid_2_neuronni_merezhi/README.md) |
 | [4.10](Thema%204/Practica4_10/README.md) | Глибоке навчання в індивідуальному проєкті: класифікація зображень, baseline проти CNN, аугментація та domain shift |
 | [4.13](Thema%204/Practica4_13/README.md) | Репозиторії аналітичних моделей: transfer learning (MobileNetV2) і reinforcement learning (DQN), презентація |
+| [4.15](Thema%204/Practica4_15/README.md) | NLP, варіант 1: пошук службових повідомлень (TF–IDF, косинусна схожість), перевірка релевантності, символьні n-грами |
 
 ### Тема 5. Візуалізація та аналітичні системи
 | Практика | Опис |
@@ -35,7 +36,7 @@
 ```
 Тема 2.3/     HTML-панель
 Thema 3/      практики 3.3, 3.5
-Thema 4/      практики 4.3, 4.5, 4.8, 4.10, 4.13
+Thema 4/      практики 4.3, 4.5, 4.8, 4.10, 4.13, 4.15
 Thema 5/      практики 5.3, 5.8
 ```
 
@@ -47,6 +48,7 @@ Thema 5/      практики 5.3, 5.8
 |---|---|
 | 3.3, 3.5, 4.3, 4.5 | `pandas`, `numpy`, `matplotlib`, `seaborn`, `scikit-learn`, `scipy` |
 | 4.8, 4.10, 4.13 | те саме + `tensorflow`; для 4.10 є [`requirements.txt`](Thema%204/Practica4_10/requirements.txt), ноутбуки запускаються по черзі `01` → `02` → `03` |
+| 4.15 | `scikit-learn`, `notebook` — [`requirements.txt`](Thema%204/Practica4_15/requirements.txt) |
 | 5.3 | `pandas`, `numpy`, `plotly`, `kaleido` (PNG у ноутбуці), `dash` (інтерактивний `app.py`) |
 | 5.8 | `fastapi`, `uvicorn`, `psycopg2-binary`, `python-dotenv` і встановлений PostgreSQL; див. [`README`](Thema%205/Practica5_8/README.md) та [`requirements.txt`](Thema%205/Practica5_8/requirements.txt) |
 
