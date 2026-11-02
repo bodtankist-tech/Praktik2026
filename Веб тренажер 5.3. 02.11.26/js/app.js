@@ -62,7 +62,7 @@ const ICON_SND_OFF='<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><p
 const RAIN=(()=>{
   const cv=$('rain'), ctx=cv.getContext('2d'), desk=$('desk');
   const CH='アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ЖЗИЛФЦЧШЮЯ';
-  const FS=16, BG='5,12,8';
+  const FS=16, BG='3,9,13';
   let drops=[], w=0, h=0, raf=0, last=0, goldUntil=0, on=false;
   const rnd=()=>CH[Math.random()*CH.length|0];
   function resize(){
@@ -80,8 +80,8 @@ const RAIN=(()=>{
     ctx.font=`${FS}px "JetBrains Mono", monospace`; ctx.textBaseline='top';
     for(let i=0;i<drops.length;i++){
       const x=i*FS, y=drops[i]*FS;
-      ctx.fillStyle=gold?'#e8b934':'rgba(59,209,111,.8)'; ctx.fillText(rnd(),x,y-FS); // хвіст
-      ctx.fillStyle=gold?'#ffd75e':'#d6ffe2'; ctx.fillText(rnd(),x,y);              // яскрава «голова»
+      ctx.fillStyle=gold?'#e8b934':'rgba(0,229,255,.75)'; ctx.fillText(rnd(),x,y-FS); // хвіст
+      ctx.fillStyle=gold?'#ffd75e':'#e2fdff'; ctx.fillText(rnd(),x,y);              // яскрава «голова»
       if(y>h&&Math.random()>.97) drops[i]=-Math.random()*8;
       drops[i]+=gold?1.7:1;
     }
@@ -135,6 +135,7 @@ function award(id){
 
 const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
 function tick(){
+  $('clock').textContent=new Date().toLocaleTimeString('uk-UA',{hour12:false});
   if(exam){
     const left=Math.max(0,EXAM_LIMIT-Math.floor((Date.now()-exam.start)/1000));
     $('examTime').textContent=fmt(left);
@@ -153,8 +154,10 @@ function applyStatic(){
   document.querySelectorAll('[data-i18n-title]').forEach(el=>el.title=t(el.dataset.i18nTitle));
   document.querySelectorAll('#uiSeg button').forEach(b=>b.classList.toggle('on',b.dataset.ui===ui()));
 }
+// Обидва перемикачі УКР / ENG (угорі й у полі запиту) змінюють мову повністю: інтерфейс і команди.
+// Поле запиту й так приймає команди обома мовами.
 function setUi(lang){
-  if(ui()===lang){ $('q').focus(); return; }
+  if(ui()===lang&&cmd()===lang){ $('q').focus(); return; }
   state.ui=lang; save(); applyStatic(); renderDict(); renderStats();
   if(cmd()!==lang) setCmd(lang); else { renderText(); renderCards(true); preview(); }
 }
@@ -639,7 +642,7 @@ $('q').addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();su
 $('run').onclick=submit;
 $('clear').onclick=()=>{$('q').value=''; preview(); $('q').focus();};
 $('tip').onclick=()=>{ if(exam) return; hintN=Math.min(hintN+1,LEVELS[curLevel].hints.length); renderHints(); SND.click(); $('q').focus(); };
-document.querySelectorAll('#cmdSeg button').forEach(b=>b.onclick=()=>setCmd(b.dataset.cmd));
+document.querySelectorAll('#cmdSeg button').forEach(b=>b.onclick=()=>setUi(b.dataset.cmd));
 document.querySelectorAll('#uiSeg button').forEach(b=>b.onclick=()=>setUi(b.dataset.ui));
 $('hint').onclick=()=>{ if(exam) return; $('q').value=T(LEVELS[curLevel].sol); usedAnswer=true; preview(); setFb(t('fb.answer'),''); $('q').focus(); };
 $('prev').onclick=()=>loadLevel(state.level-1);

@@ -361,3 +361,192 @@ textarea{width:100%;font-family:var(--mono);font-size:12.5px;resize:vertical}
 .h-word{color:#e9e6da}
 .h-bad{color:#ff7b72;text-decoration:underline wavy #ff7b72;text-underline-offset:3px}
 .syntax .h-word,.ex .h-word,.hint .h-word,.cheat .h-word{color:#e9e6da}
+
+/* =====================================================================
+   ТЕМА «ТАКТИЧНИЙ HUD»
+   Перекриває класичний вигляд: чорний фон, ціанові лінії, кутові дужки,
+   сітка й скан-лінії. Кольори: --accent ціан, --ok зелений, --warn бурштин, --bad червоний.
+   ===================================================================== */
+:root{
+  --bg:#04080b; --bg2:rgba(8,20,27,.78); --line:rgba(0,229,255,.22); --line2:rgba(0,229,255,.45);
+  --ink:#d6f6ff; --muted:#6e909b; --accent:#00e5ff; --accent2:#39ff9f; --ok:#39ff9f; --warn:#ffb627; --bad:#ff3b5c;
+  --paper:#08161d; --paper-ink:#d6f6ff; --paper-muted:#7aa2ad;
+  --glass:rgba(6,16,22,.9);
+  --glow:0 0 14px rgba(0,229,255,.35);
+  /* кутові дужки прицілу: 8 шарів фону, без додаткової розмітки */
+  --brk:linear-gradient(#00e5ff,#00e5ff) 0 0/14px 1.5px no-repeat,linear-gradient(#00e5ff,#00e5ff) 0 0/1.5px 14px no-repeat,
+        linear-gradient(#00e5ff,#00e5ff) 100% 0/14px 1.5px no-repeat,linear-gradient(#00e5ff,#00e5ff) 100% 0/1.5px 14px no-repeat,
+        linear-gradient(#00e5ff,#00e5ff) 0 100%/14px 1.5px no-repeat,linear-gradient(#00e5ff,#00e5ff) 0 100%/1.5px 14px no-repeat,
+        linear-gradient(#00e5ff,#00e5ff) 100% 100%/14px 1.5px no-repeat,linear-gradient(#00e5ff,#00e5ff) 100% 100%/1.5px 14px no-repeat;
+  --cut:polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px);
+}
+html,body{background:
+  radial-gradient(ellipse at 50% -10%,rgba(0,229,255,.10),transparent 55%),
+  linear-gradient(rgba(0,229,255,.035) 1px,transparent 1px) 0 0/40px 40px,
+  linear-gradient(90deg,rgba(0,229,255,.035) 1px,transparent 1px) 0 0/40px 40px,
+  var(--bg)}
+/* скан-лінії монітора і повільна смуга сканування */
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:60;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px)}
+body::before{content:"";position:fixed;left:0;right:0;top:-140px;height:140px;pointer-events:none;z-index:59;
+  background:linear-gradient(transparent,rgba(0,229,255,.06),transparent);animation:sweep 9s linear infinite}
+@keyframes sweep{to{transform:translateY(calc(100vh + 140px))}}
+@media (prefers-reduced-motion:reduce){body::before{display:none}}
+
+/* шапка */
+.brand{font-weight:700;letter-spacing:.18em;color:#e8fbff;text-shadow:0 0 10px rgba(0,229,255,.55)}
+.brand small{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);text-shadow:none;margin-top:2px}
+.sys{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--ok);white-space:nowrap}
+.sys i{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);animation:blink 1.6s steps(2) infinite}
+.sys b{color:var(--muted);font-weight:400}
+.progress{height:6px;border-radius:0;background:rgba(0,229,255,.08);border:1px solid var(--line)}
+.progress i{background:repeating-linear-gradient(90deg,var(--accent) 0 6px,transparent 6px 8px);box-shadow:var(--glow)}
+.task{text-transform:uppercase;letter-spacing:.03em;color:#eafcff}
+.task::before{content:"▸ ";color:var(--accent)}
+.task-sub{font-size:13.5px}
+
+/* кнопки, перемикачі, чипи */
+.btn,.lvlnav button,.iconbtn,.chip,.seg{border-radius:0}
+.btn{background:var(--accent);color:#001318;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;font-size:13px;clip-path:var(--cut);transition:box-shadow .2s,filter .2s}
+.btn:hover{filter:brightness(1.15);box-shadow:var(--glow)}
+.btn.ghost{background:rgba(0,229,255,.04);color:var(--accent);border:1px solid var(--line2)}
+.btn.ghost:hover{color:#eafcff;background:rgba(0,229,255,.12)}
+.btn.exam-btn{color:var(--warn);border-color:var(--warn);background:rgba(255,182,39,.06)}
+.btn.exam-btn:hover{background:rgba(255,182,39,.16);box-shadow:0 0 14px rgba(255,182,39,.35)}
+.lvlnav button,.iconbtn,.chip{background:rgba(0,229,255,.04);border:1px solid var(--line);color:var(--ink)}
+.lvlnav button:hover,.iconbtn:hover{border-color:var(--accent);box-shadow:var(--glow)}
+.chip b{color:var(--accent)}
+.chip.rank b{color:var(--ok)}
+.seg{border-color:var(--line2)}
+.seg button{color:var(--muted)}
+.seg button.on{background:var(--accent);color:#001318}
+
+/* дошка */
+.desk{border-radius:0;border:1px solid var(--line);
+  background:var(--brk),
+   radial-gradient(ellipse at 50% 0%,rgba(0,229,255,.08),transparent 60%),
+   linear-gradient(rgba(0,229,255,.05) 1px,transparent 1px) 0 0/32px 32px,
+   linear-gradient(90deg,rgba(0,229,255,.05) 1px,transparent 1px) 0 0/32px 32px,
+   #03090d;
+  box-shadow:inset 0 0 40px rgba(0,0,0,.6)}
+.desk.rain{background:var(--brk),#03090d;box-shadow:inset 0 0 40px rgba(0,0,0,.6)}
+.desk-label,.desk.rain .desk-label{background:var(--accent);color:#001318;border-radius:0;clip-path:polygon(0 0,100% 0,calc(100% - 7px) 100%,0 100%);padding-right:14px;letter-spacing:.12em}
+
+/* картки: темне скло з дужками, без паперового нахилу */
+.card{--rot:0deg!important;border-radius:0;border:1px solid var(--line);background:var(--brk),var(--glass);color:var(--ink);
+  box-shadow:0 8px 24px rgba(0,0,0,.55);outline-offset:4px}
+.card::before{content:"";position:absolute;top:0;left:14px;right:14px;height:1px;width:auto;margin:0;transform:none;box-shadow:none;
+  background:linear-gradient(90deg,transparent,rgba(0,229,255,.6),transparent)}
+.card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,.6),var(--glow)}
+.card .ico{background:rgba(0,229,255,.1);border:1px solid var(--line);border-radius:0}
+.card .ico svg{stroke:var(--accent)}
+.card .type{color:var(--accent)}
+.card .num{color:var(--muted)}
+.card .ttl{color:#eafcff}
+.card .meta,.card .gloss{color:var(--paper-muted)}
+.badge{border-radius:0}
+.pri-h{color:var(--bad)}
+.card .ph{border-radius:0;margin:0 -2px;background:#02070a;border:1px solid var(--line)}
+.card .ph img,.card .ph video{filter:saturate(.7) contrast(1.08) brightness(.92)}
+.card .ph::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(rgba(0,229,255,.07),rgba(0,229,255,.07)),repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px)}
+.card .live{border-radius:0;background:rgba(0,0,0,.7);border:1px solid var(--bad);color:#ffd6dd}
+.card .zoom{border-radius:0;border:1px solid var(--accent);background:rgba(0,10,14,.7)}
+.card .simscore{border-radius:0;background:rgba(0,229,255,.12);color:var(--accent)}
+.card .simscore.ok{background:var(--ok);color:#001a0c}
+/* ціль: бурштинове «захоплення» замість підстрибування */
+.card.target::after{inset:-7px;border-radius:0;border:1px dashed rgba(255,182,39,.9)}
+.card.target.dealt{animation:lock 1.6s ease-in-out var(--bd,0s) infinite}
+@keyframes lock{0%,100%{box-shadow:0 8px 24px rgba(0,0,0,.55),0 0 0 rgba(255,182,39,0)}50%{box-shadow:0 8px 24px rgba(0,0,0,.55),0 0 22px rgba(255,182,39,.45)}}
+.card.hit{outline:1px solid var(--ok);box-shadow:0 0 18px rgba(57,255,159,.45)}
+.card.wrong{outline:1px solid var(--bad);box-shadow:0 0 18px rgba(255,59,92,.5)}
+.card.missed{outline:1px dashed var(--warn)}
+.card.hover-link{outline:1px solid var(--accent)}
+/* поява: картка «матеріалізується» згори вниз */
+@keyframes deal{from{opacity:0;clip-path:inset(0 0 100% 0);filter:brightness(2.2)}60%{filter:brightness(1.4)}to{clip-path:inset(0 0 0 0)}}
+.card.fly{transform:translateY(-30px) scale(.96);filter:blur(3px) brightness(1.8);opacity:0}
+.stamp{transform:translate(-50%,-50%) scale(1.8);color:var(--ok);border:1px solid var(--ok);border-radius:0;background:rgba(0,20,10,.85);
+  font-family:var(--mono);font-size:13px;letter-spacing:.2em;text-shadow:0 0 8px var(--ok);box-shadow:0 0 18px rgba(57,255,159,.45)}
+@keyframes stamp{to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+
+/* редактор — термінал */
+.editor,details.records,.mapwrap{border-radius:0;border:1px solid var(--line);background:var(--brk),rgba(3,10,14,.88)}
+.editor-head{background:rgba(0,229,255,.05);border-bottom:1px solid var(--line);text-transform:uppercase;letter-spacing:.06em}
+.prompt{color:var(--accent);text-shadow:0 0 8px rgba(0,229,255,.6)}
+#q{caret-color:var(--accent)}
+#q::placeholder{color:#3c5a63}
+.feedback.ok{color:var(--ok)}
+ul.why li{border-radius:0}
+.hint{border-radius:0;background:rgba(0,229,255,.05);border:1px solid var(--line);border-left:3px solid var(--accent)}
+.hint b{color:var(--accent)}
+.rec{border-radius:0}
+.rec:hover,.rec.hover-link{background:rgba(0,229,255,.08)}
+.rec .rid{color:var(--accent)}
+.rec .rk{color:#5fa8c4}
+.rec .rv{color:#f2cc60}
+
+/* бічна панель уроку */
+aside{background:linear-gradient(180deg,rgba(0,229,255,.05),transparent 240px),rgba(4,12,16,.92);border-left:1px solid var(--line2)}
+.lesson-n{color:var(--accent)}
+.lesson-n::before{content:"// "}
+.lesson-t{text-transform:uppercase;letter-spacing:.03em;font-size:17px;color:#eafcff}
+.syntax{border-radius:0;background:rgba(0,229,255,.05);border:1px solid var(--line);border-left:3px solid var(--accent);box-shadow:inset 0 0 18px rgba(0,229,255,.05)}
+.lesson-body{color:#b9d6de}
+.lesson-body code,.ex code,.hint code{border-radius:0;background:rgba(0,229,255,.06);border-color:var(--line);color:#bfefff}
+.lesson-body td{border-top-color:var(--line)}
+.lesson-body td:first-child{color:var(--accent)}
+.ex div{color:#b9d6de}
+.cheat,.credits-link{border-top-color:var(--line)}
+.cheat h4,.ex-h,details.dict summary{color:var(--accent);letter-spacing:.12em}
+.guide figure{border-radius:0;background:var(--brk),rgba(3,10,14,.9);border-color:var(--line)}
+.guide figure:hover{border-color:var(--accent);box-shadow:var(--glow)}
+.guide img{filter:saturate(.75) contrast(1.05)}
+.guide figcaption{color:#b9d6de}
+.vcredit a,.cred-list a,.credits-link a,.linkbtn{color:var(--accent)}
+
+/* вікна: меню, перегляд, сповіщення */
+.overlay{background:rgba(1,6,9,.82);backdrop-filter:blur(3px)}
+.panel{border-radius:0;border:1px solid var(--line2);background:var(--brk),rgba(4,13,18,.97);box-shadow:0 0 40px rgba(0,229,255,.12)}
+.panel h2,.finale .big{text-transform:uppercase;letter-spacing:.04em;color:#eafcff}
+.lv-item,.badge-item{border-radius:0;background:rgba(0,229,255,.03);border-color:var(--line)}
+.lv-item:hover{border-color:var(--accent);box-shadow:var(--glow)}
+.lv-item.cur{border-color:var(--accent);background:rgba(0,229,255,.1)}
+.lv-item .ck{color:var(--ok)}
+.lv-item .ck.hint{color:var(--warn)}
+.lv-item .pts{color:var(--accent)}
+.part{color:var(--accent);letter-spacing:.14em}
+.viewer{background:rgba(1,6,9,.94)}
+.vmedia{border-radius:0;border:1px solid var(--line2);background:var(--brk),#000;padding:6px}
+.vinfo .eq{color:var(--warn)}
+.toast{border-radius:0;background:var(--brk),rgba(4,13,18,.97);border-color:var(--line2);box-shadow:0 0 24px rgba(0,229,255,.2)}
+.medal{border-radius:0;clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);
+  background:linear-gradient(135deg,#7ff3ff,#00a3b8);color:#001318;box-shadow:none}
+.medal.off{background:#0d2027;color:#2f4b54}
+.fld input,textarea{border-radius:0;background:rgba(0,229,255,.04);border-color:var(--line2)}
+.exambar{border-radius:0;background:rgba(255,182,39,.08);border-color:var(--warn)}
+.exambar b{color:var(--warn)}
+.rep-grade{border-radius:0;border-color:var(--accent)}
+.rep-grade b{color:var(--accent);text-shadow:0 0 12px rgba(0,229,255,.5)}
+.rep-tbl td.ok{color:var(--ok)}
+.rep-code code{border-radius:0;background:rgba(0,229,255,.05);color:#bfefff}
+
+/* карта в тактичних кольорах */
+.m-land{fill:#03121a}
+.m-forest{fill:rgba(57,255,159,.07);stroke:rgba(57,255,159,.35);stroke-dasharray:3 3}
+.m-river{stroke:#1aa3ff;opacity:.7}
+.m-road{stroke:#7aa2ad;opacity:.75}
+.m-bridge{fill:var(--warn);stroke:#000}
+.m-grid{stroke:rgba(0,229,255,.18)}
+.m-lbl{fill:#5fa8c4}
+.m-place{fill:#d6f6ff;stroke:#03121a}
+.m-range{fill:rgba(255,182,39,.10);stroke:var(--warn)}
+.m-mark circle{fill:#04141b;stroke:var(--accent)}
+.m-mark text{fill:var(--accent)}
+.m-mark.target circle{stroke:var(--warn)}
+.m-mark.hit circle{fill:var(--ok)}
+.m-mark.hit text,.m-mark.wrong text,.m-mark.hover-link text{fill:#001318}
+.m-mark.wrong circle{fill:var(--bad)}
+.m-mark.missed circle{stroke:var(--warn)}
+.m-mark.hover-link circle{fill:var(--accent)}
+
+@media print{ body::before,body::after{display:none} .report *{text-shadow:none!important} }

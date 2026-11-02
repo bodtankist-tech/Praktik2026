@@ -3,7 +3,7 @@
 const I18N = {
 ua:{
  'doc.title':'Картотека — тренажер аналітика',
- 'brand.name':'КАРТОТЕКА',
+ 'brand.name':'КАРТОТЕКА','sys.online':'СИСТЕМА АКТИВНА',
  'brand.sub':'тренажер пошуку та оцінювання інформації для аналітичних підрозділів',
  'ui.title':'Мова інтерфейсу','score.title':'Набрані бали','rank.title':'Звання за сумою балів',
  'sound.on':'Увімкнути звук','sound.off':'Вимкнути звук',
@@ -13,7 +13,7 @@ ua:{
  'task.sub':'Напишіть запит, який відбере <b>тільки</b> картки, що підстрибують, і натисніть Enter. Команди можна писати українською або англійською. Клацніть картку зі знімком, щоб розглянути його. Навчальний сценарій: усі дані вигадані, знімки лише ілюструють матеріали.',
  'desk.label':'СТІЛ АНАЛІТИКА','map.title':'Карта ділянки «Схід» · кілометрова сітка','map.aria':'Схематична карта ділянки з позначками карток',
  'map.legend':'Позначки — номери карток. Річка, дорога й населені пункти умовні.',
- 'editor.head':'запит до картотеки','cmd.title':'Мова команд. Запит приймається обома мовами.','timer.title':'Час на рівні',
+ 'editor.head':'запит до картотеки','cmd.title':'Мова інтерфейсу й команд. Запит приймається обома мовами.','timer.title':'Час на рівні',
  'editor.prompt':'ЗАПИТ>','editor.ph':'наприклад: {ex}','btn.run':'Виконати',
  'hint.first':'Підказка (1/{n})','hint.more':'Ще підказка ({i}/{n})','hint.none':'Підказки вичерпано',
  'btn.answer':'Показати відповідь','btn.clear':'Очистити','btn.close':'Закрити','btn.cancel':'Скасувати',
@@ -83,7 +83,7 @@ ua:{
 },
 en:{
  'doc.title':'Kartoteka — intelligence analyst trainer',
- 'brand.name':'KARTOTEKA',
+ 'brand.name':'KARTOTEKA','sys.online':'SYSTEM ONLINE',
  'brand.sub':'search and source-assessment training for intelligence analysis units',
  'ui.title':'Interface language','score.title':'Points scored','rank.title':'Rank based on total points',
  'sound.on':'Turn sound on','sound.off':'Turn sound off',
@@ -93,7 +93,7 @@ en:{
  'task.sub':'Write a query that selects <b>only</b> the bouncing cards, then press Enter. Commands can be typed in Ukrainian or English. Click a card with a picture to enlarge it. This is a training scenario: all data is fictional, and the pictures only illustrate the materials.',
  'desk.label':'ANALYST’S DESK','map.title':'“East” sector map · kilometre grid','map.aria':'Schematic map of the sector with card markers',
  'map.legend':'Markers show card numbers. The river, roads and villages are fictional.',
- 'editor.head':'query the card index','cmd.title':'Command language. Queries are accepted in either language.','timer.title':'Time spent on this level',
+ 'editor.head':'query the card index','cmd.title':'Interface and command language. Queries are accepted in either language.','timer.title':'Time spent on this level',
  'editor.prompt':'QUERY>','editor.ph':'e.g. {ex}','btn.run':'Run',
  'hint.first':'Hint (1/{n})','hint.more':'Next hint ({i}/{n})','hint.none':'No hints left',
  'btn.answer':'Show answer','btn.clear':'Clear','btn.close':'Close','btn.cancel':'Cancel',
