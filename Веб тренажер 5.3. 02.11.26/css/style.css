@@ -560,8 +560,9 @@ main{overflow-x:clip}
 body.d3 .desk{transform-style:preserve-3d;transform-origin:50% 60%;
   transform:perspective(1500px) rotateX(calc(8deg - var(--dy,0) * 6deg)) rotateY(calc(var(--dx,0) * 7deg));
   transition:transform .3s ease-out}
-body.d3 .desk .rain-cv{transform:translateZ(-1px)}
-body.d3 .desk .desk-label{transform:translateZ(70px)} /* напис над картками, що висять над столом */
+body.d3 .desk .rain-cv{transform:translateZ(1px)} /* над фоном стола, але під картками; за фоном дощу не видно */
+body.d3 .desk .desk-label{transform:translateZ(30px)} /* напис над картками, що висять над столом */
+body.d3 .desk{margin-top:16px}
 body.d3 .desk .card{transform:translateZ(var(--z,14px)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
   transition:transform .18s ease-out,box-shadow .25s,opacity .3s,outline-color .2s}
 body.d3 .desk .card.target{--z:30px}
@@ -592,3 +593,5 @@ body.d3 .btn:active,body.d3 .iconbtn:active{transform:translateY(1px) scale(.97)
 .iconbtn.txt{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.04em;width:auto;padding:0 8px}
 .iconbtn.txt.off{color:var(--muted);text-decoration:line-through}
 @media print{ body.d3 .desk,body.d3 #map svg{transform:none!important} }
+
+.card .gloss.orig{font-style:normal;font-family:var(--mono);font-size:10.5px;letter-spacing:.02em}

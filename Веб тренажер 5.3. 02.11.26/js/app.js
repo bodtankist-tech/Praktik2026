@@ -290,7 +290,7 @@ function renderCards(noDeal){
       vid?`<span class="live"><i></i>${t(m.video?'card.video':'card.still')}</span>`:''}<span class="zoom">${ZOOM_SVG}</span></div>`:'';
     el.innerHTML=`<div class="row"><span class="ico"><svg viewBox="0 0 24 24">${ICONS[c.type]}</svg></span><span class="type">${valName('type',c.type)}</span><span class="simscore"></span><span class="num">${num(c.id)}</span></div>
       ${ph}<div class="row"><span class="badge" style="background:${SRC_COL[c.src]}" title="${esc(t('card.badge',{s:SRC_TXT[ui()][c.src],i:INFO_TXT[ui()][c.info]}))}">${c.src}${c.info}</span>${c.pri==='високий'?`<span class="pri-h">● ${t('card.urgent')}</span>`:''}</div>
-      <div class="ttl">${esc(c.title)}</div>${ui()==='en'&&c.titleEn?`<div class="gloss">${esc(c.titleEn)}</div>`:''}
+      ${ui()==='en'&&c.titleEn?`<div class="ttl">${esc(c.titleEn)}</div><div class="gloss orig" title="${esc(t('card.orig'))}">UA: ${esc(c.title)}</div>`:`<div class="ttl">${esc(c.title)}</div>`}
       <div class="meta"><span>${valName('reg',c.reg)}</span><span>${c.date}</span><span>${valName('lang',c.lang)}</span>${c.sq?`<span>⌖${c.sq}</span>`:''}</div>`;
     el.addEventListener('animationend',e=>{ if(e.animationName==='deal'||e.animationName==='deal3') el.classList.add('dealt'); });
     el.addEventListener('mouseenter',()=>{
@@ -315,7 +315,7 @@ function renderCards(noDeal){
     return x.length?' '+x.join(' '):''; };
   $('recList').innerHTML=cards.map(c=>`<div class="rec" data-id="${c.id}"><span class="rid">${num(c.id)}</span><span>${
     [kv('type',c.type),kv('src',c.src),kv('info',c.info),kv('reg',c.reg),kv('date',c.date),kv('lang',c.lang),kv('pri',c.pri)].join(' ')+extra(c)
-  }</span><span class="rt">«${esc(c.title)}»${ui()==='en'&&c.titleEn?` <i>${esc(c.titleEn)}</i>`:''}</span></div>`).join('');
+  }</span><span class="rt">${ui()==='en'&&c.titleEn?`${esc(c.titleEn)} <i>UA: «${esc(c.title)}»</i>`:`«${esc(c.title)}»`}</span></div>`).join('');
   $('recList').querySelectorAll('.rec').forEach(r=>{
     r.addEventListener('mouseenter',()=>link(+r.dataset.id,true));
     r.addEventListener('mouseleave',()=>link(+r.dataset.id,false));
@@ -384,7 +384,7 @@ function openCard(c){
   const m=MED[c.media];
   const eq=c.equip?(!exam&&state.done[curLevel]?t('view.eq',{v:valName('equip',c.equip)}):t('view.eq?')):'';
   openViewer(`<div class="vmedia">${mediaHtml(c.media,m.video)}</div>
-    <div class="vinfo"><h3>«${esc(c.title)}»${ui()==='en'&&c.titleEn?` <small>${esc(c.titleEn)}</small>`:''}</h3><div class="m">${num(c.id)} · ${valName('type',c.type)} · ${t('view.grade')} ${c.src}${c.info}: ${SRC_TXT[ui()][c.src]}, ${INFO_TXT[ui()][c.info]} · ${valName('reg',c.reg)} · ${c.date}${c.sq?' · ⌖'+c.sq:''}</div>${eq?`<div class="eq">${eq}</div>`:''}</div>
+    <div class="vinfo"><h3>${ui()==='en'&&c.titleEn?`${esc(c.titleEn)} <small>UA: «${esc(c.title)}»</small>`:`«${esc(c.title)}»`}</h3><div class="m">${num(c.id)} · ${valName('type',c.type)} · ${t('view.grade')} ${c.src}${c.info}: ${SRC_TXT[ui()][c.src]}, ${INFO_TXT[ui()][c.info]} · ${valName('reg',c.reg)} · ${c.date}${c.sq?' · ⌖'+c.sq:''}</div>${eq?`<div class="eq">${eq}</div>`:''}</div>
     ${credit(c.media)}<div class="vcredit">${t('view.note')}</div>`);
 }
 function openRef(e){
