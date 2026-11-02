@@ -141,6 +141,29 @@ aside{background:var(--bg2);border-left:1px solid var(--line);padding:22px 24px 
 .panel .row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
 .part{grid-column:1/-1;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);margin-top:8px}
 
+/* command language switch */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{background:transparent;border:0;color:var(--muted);font-family:var(--mono);font-size:11px;padding:2px 9px;letter-spacing:.04em}
+.seg button:hover{color:var(--ink)}
+.seg button.on{background:var(--accent);color:#2a2410;font-weight:600}
+.btn:disabled{opacity:.45;cursor:default;filter:none}
+
+/* hints */
+.hints{display:flex;flex-direction:column;gap:6px}
+.hints:empty{display:none}
+.hint{background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:8px 12px;font-size:14px;color:#d6d3c6;animation:fadein .3s}
+.hint b{font-family:var(--mono);color:var(--accent);font-weight:600;margin-right:8px;font-size:12px}
+.hint code{background:#141a17;border:1px solid var(--line);border-radius:4px;padding:0 5px;color:#e3c27a}
+@keyframes fadein{from{opacity:0;transform:translateY(-4px)}}
+
+/* dictionary */
+details.dict{margin-top:12px}
+details.dict summary{cursor:pointer;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+details.dict summary:hover{color:var(--ink)}
+.dict table{margin-top:6px}
+.dict th{text-align:left;font-weight:500;font-size:11px;color:var(--accent);padding:2px 0}
+.dict td{font-family:var(--mono);font-size:12px;color:#e3c27a;padding:3px 10px 3px 0;white-space:normal!important}
+
 .finale{text-align:center}
 .finale .big{font-family:var(--head);font-size:26px;margin:6px 0}
 </style>
@@ -161,24 +184,26 @@ aside{background:var(--bg2);border-left:1px solid var(--line);padding:22px 24px 
 
   <div>
     <h1 class="task" id="task"></h1>
-    <p class="task-sub">Напишіть запит, який відбере <b>тільки</b> картки, що підстрибують, і натисніть Enter. Навчальний сценарій: усі дані вигадані.</p>
+    <p class="task-sub">Напишіть запит, який відбере <b>тільки</b> картки, що підстрибують, і натисніть Enter. Команди можна писати українською або англійською (перемикач УКР / ENG). Навчальний сценарій: усі дані вигадані.</p>
   </div>
 
   <div class="desk" id="desk"><span class="desk-label">СТІЛ АНАЛІТИКА</span></div>
 
   <div class="editor" id="editor">
-    <div class="editor-head"><span>запит до картотеки</span><span class="count" id="count">—</span></div>
+    <div class="editor-head"><span>запит до картотеки</span><span class="seg" id="cmdSeg" title="Мова команд у прикладах і підказках. Запит приймається обома мовами."><button data-cmd="ua">УКР</button><button data-cmd="en">ENG</button></span><span class="count" id="count">—</span></div>
     <div class="editor-body">
-      <span class="prompt">ЗАПИТ&gt;</span>
+      <span class="prompt" id="promptLbl">ЗАПИТ&gt;</span>
       <input id="q" autocomplete="off" spellcheck="false" placeholder="наприклад: тип:фото">
       <button class="btn" id="run">Виконати</button>
     </div>
     <div class="feedback" id="fb"></div>
   </div>
   <div class="tools">
+    <button class="btn ghost" id="tip">Підказка</button>
     <button class="btn ghost" id="hint">Показати відповідь</button>
     <button class="btn ghost" id="clear">Очистити</button>
   </div>
+  <div class="hints" id="hints"></div>
 
   <details class="records" id="records" open>
     <summary>Облікові записи карток <span>— точні значення полів; наведіть, щоб знайти картку на столі</span></summary>
@@ -197,16 +222,8 @@ aside{background:var(--bg2);border-left:1px solid var(--line);padding:22px 24px 
   <div class="ex" id="lex"></div>
   <div class="cheat">
     <h4>Шпаргалка</h4>
-    <table>
-      <tr><td>слово</td><td>частина слова в заголовку</td></tr>
-      <tr><td>"фраза"</td><td>точний збіг фрази</td></tr>
-      <tr><td>A B</td><td>обидві умови (І)</td></tr>
-      <tr><td>A АБО B</td><td>будь-яка з умов</td></tr>
-      <tr><td>-A, НЕ A</td><td>виключити</td></tr>
-      <tr><td>( … )</td><td>групування</td></tr>
-      <tr><td>поле:знач</td><td>тип, район, джерело, інфо, оцінка, дата, мова, пріоритет</td></tr>
-      <tr><td>&lt; &lt;= &gt; &gt;= ..</td><td>порівняння та діапазон</td></tr>
-    </table>
+    <table id="cheatTbl"></table>
+    <details class="dict"><summary>Словник команд УКР ↔ ENG</summary><table id="dictTbl"></table></details>
   </div>
 </aside>
 </div>
@@ -285,7 +302,7 @@ const LEVELS = [
  {part:'Логічні оператори', title:'Будь-яка з умов (АБО)', task:'Відберіть усі фото- та відеоматеріали', syntax:'тип:фото АБО тип:відео',
   cards:[3,1,2,11,7,14,8,17], sol:'тип:фото АБО тип:відео',
   body:`<p><code>АБО</code> (чи <code>OR</code>) відбирає картки, що відповідають <b>хоча б одній</b> з умов. Кожне «АБО» <b>розширює</b> вибірку.</p><p>Типова помилка: <code>тип:фото тип:відео</code> без «АБО» вимагає, щоб картка була водночас і фото, і відео. Таких немає.</p>`,
-  ex:[['район:Схід АБО район:Південь','обидва райони'],['тип:аудіо OR тип:відео','англійське написання теж працює']]},
+  ex:[['район:Схід АБО район:Південь','обидва райони'],['тип:аудіо АБО тип:відео','аудіо- та відеозаписи']]},
  {title:'Чергування голосних', task:'Знайдіть усі матеріали про мости', syntax:'міст АБО мост',
   cards:[5,12,1,24,14,22,10], sol:'міст АБО мост',
   body:`<p>В українській основа слова може змінюватися: <b>міст</b> → <b>мосту</b>, <b>мости</b>, <b>мостів</b>. Одна основа всіх форм не охоплює.</p><p>Об'єднайте варіанти через <code>АБО</code>. Так само: «ріг/рогу», «віз/воза», «Київ/Києва».</p>`,
@@ -338,11 +355,77 @@ const LEVELS = [
   cards:[3,7,2,6,10,25], sol:'-мова:укр',
   body:`<p>Мова матеріалу: <code>укр</code>, <code>англ</code>, <code>інша</code>. Іншомовні матеріали зазвичай потребують перекладу, тому їх доручають окремій групі.</p><p>Замість <code>мова:англ АБО мова:інша</code> коротше виключити українську.</p>`,
   ex:[['мова:англ','лише англомовні'],['пріоритет:високий','термінові матеріали']]},
- {part:'Підсумок', title:'Вибірка для доповіді', task:'Підготуйте вибірку для доповіді: джерело A–B, інформація 1–2, район «Схід», з 20 жовтня 2026, без дописів', syntax:'… усе разом',
+ {part:'Підсумок', title:'Вибірка для доповіді', task:'Підготуйте вибірку для доповіді: джерело A–B, інформація 1–2, район «Схід», з 20 жовтня 2026, без дописів', syntax:'… усе разом', syntaxEn:'… all together',
   cards:[1,6,10,15,26,21,4,11,31], sol:'джерело:<=B інфо:<=2 район:Схід дата:>=2026-10-20 -тип:допис',
   body:`<p>Підсумкове завдання поєднує все вивчене. Будуйте запит поступово: додавайте одну умову й дивіться, як змінюється зелене підсвічування.</p><p>Перевірте кожну вимогу: оцінку джерела, оцінку інформації, район, дату та тип.</p>`,
   ex:[['джерело:<=B інфо:<=2','почніть з оцінки'],['… район:Схід дата:>=2026-10-20','потім район і дата']]},
 ];
+
+/* Поступові підказки: від натяку до майже готового запиту.
+   {{…}} — команда, показується мовою, обраною перемикачем УКР / ENG. */
+const HINTS = [
+ ['Подивіться на іконки й підписи вгорі карток: усі картки, що підстрибують, мають однаковий тип.',
+  'Потрібне поле {{тип:}}. Між назвою поля і значенням ставиться двокрапка без пробілу.',
+  'Запит має вигляд {{тип:…}}, де замість «…» назва типу матеріалу.'],
+ ['Усі потрібні картки з одного району. Перевірте нижній рядок карток або облікові записи.',
+  'Використайте поле {{район:}}.',
+  'Значення поля — назва району: {{район:…}}. Регістр літер не важливий.'],
+ ['Слово «колона» в заголовках стоїть у різних формах: «колона», «колони», «колону».',
+  'Пошук без поля перевіряє частину заголовка, тож закінчення можна відкинути. Текст для пошуку завжди пишеться українською.',
+  'Залиште тільки спільну основу всіх форм: п\'ять літер.'],
+ ['Спробуйте {{пункт пропуску}} без лапок і подивіться, яка зайва картка підсвітилась.',
+  'Зайва картка містить обидва слова, але не поруч і не в тій формі.',
+  'Візьміть фразу в подвійні лапки: {{"…"}}.'],
+ ['Потрібні дві умови: тип матеріалу та слово в заголовку.',
+  'Умову за типом ви знаєте з рівня 1, а основу слова «колона» з рівня 3.',
+  'Запишіть обидві умови через пробіл: {{тип:відео …}}.'],
+ ['Жодна картка не буває водночас фото і відео. Умови треба не звужувати, а об\'єднати.',
+  'Між умовами поставте оператор {{АБО}}.',
+  'Запит має вигляд {{тип:фото АБО тип:…}}.'],
+ ['Порівняйте «міст» і «мосту»: голосна в основі змінюється.',
+  'Однієї основи не вистачить. Потрібні дві: з «і» та з «о».',
+  'Об\'єднайте їх: {{міст АБО …}}.'],
+ ['Спочатку відберіть усі звіти, а потім приберіть зайве.',
+  'Зайві картки мають у заголовку слово «Чернетка».',
+  'Поставте мінус перед словом без пробілу: {{тип:звіт -…}}.'],
+ ['Спробуйте {{тип:фото АБО тип:відео район:Схід}}. Чому підсвітились зайві фото?',
+  '«І» виконується раніше, ніж «АБО», тому район застосувався тільки до відео.',
+  'Візьміть частину з «АБО» в дужки: {{(… АБО …) район:Схід}}.'],
+ ['Надійність джерела позначає літера в кольоровій позначці на картці.',
+  'Повністю надійне джерело позначається першою літерою шкали.',
+  'Використайте поле {{джерело:}} з потрібною літерою.'],
+ ['Цифра в позначці оцінює саму інформацію, а не джерело.',
+  'Підтверджена інформація має найкращу оцінку на шкалі 1–6.',
+  'Використайте поле {{інфо:}} з потрібною цифрою.'],
+ ['Потрібна точна комбінація літери й цифри.',
+  'Поле {{оцінка:}} приймає обидві частини разом.',
+  'Інший спосіб: дві умови {{джерело:… інфо:…}}.'],
+ ['Потрібні два значення, A і B. Можна через «АБО», але є коротший запис.',
+  'Шкала йде від кращого до гіршого: A < B < C. «Не гірше за B» означає «менше або дорівнює B».',
+  'Знак порівняння ставиться після двокрапки: {{джерело:<=…}}.'],
+ ['Тут дві незалежні умови: одна для літери, друга для цифри.',
+  'Кожну запишіть через порівняння, як на рівні 13.',
+  'Запит має вигляд {{джерело:<=B інфо:<=…}}.'],
+ ['Межі діапазону входять у вибірку: потрібні цифри 2 і 3.',
+  'Можна записати двома порівняннями, але коротше діапазоном.',
+  'Діапазон записується через дві крапки: {{інфо:від..до}}.'],
+ ['«Неможливо оцінити» на шкалі джерела позначається F, на шкалі інформації 6.',
+  'Картка підходить, якщо виконується хоча б одна з двох умов.',
+  'Запит має вигляд {{джерело:F АБО інфо:…}}.'],
+ ['Дата записується у форматі РРРР-ММ-ДД.',
+  '«25 жовтня і пізніше» означає «більше або дорівнює».',
+  'Запит має вигляд {{дата:>=…}}.'],
+ ['Потрібен проміжок з двома межами, обидві включно.',
+  'Діапазон дат записується так само, як діапазон оцінок: через дві крапки.',
+  'Запит має вигляд {{дата:2026-10-10..…}}.'],
+ ['Іншомовних варіантів два: англійська та інша. Їх можна перелічити, але є коротший шлях.',
+  'Мінус працює не тільки для слів, а й для полів.',
+  'Запит має вигляд {{-мова:…}}.'],
+ ['Розбийте завдання на п\'ять умов і додавайте їх по одній, стежачи за підсвічуванням.',
+  'Оцінки: {{джерело:<=B інфо:<=2}}. Район і дата: {{район:Схід дата:>=2026-10-20}}.',
+  'Залишилось прибрати дописи: {{-тип:…}}.'],
+];
+LEVELS.forEach((L,i)=>L.hints=HINTS[i]);
 
 /* ================== ПАРСЕР ЗАПИТІВ ================== */
 class QErr extends Error{}
@@ -353,22 +436,21 @@ const normLetter = s => s.toUpperCase().split('').map(ch=>LAT[ch]||ch).join('');
 
 const FIELDS = {
   'тип':'type','type':'type',
-  'район':'reg','region':'reg',
-  'джерело':'src','source':'src','src':'src','надійність':'src',
-  'інфо':'info','info':'info','достовірність':'info',
-  'оцінка':'rating','rating':'rating','код':'rating',
+  'район':'reg','region':'reg','reg':'reg',
+  'джерело':'src','source':'src','src':'src','надійність':'src','reliability':'src',
+  'інфо':'info','info':'info','достовірність':'info','credibility':'info',
+  'оцінка':'rating','rating':'rating','код':'rating','grade':'rating',
   'дата':'date','date':'date',
-  'мова':'lang','lang':'lang',
+  'мова':'lang','lang':'lang','language':'lang',
   'пріоритет':'pri','priority':'pri'
 };
 const FIELD_UA = {type:'тип',reg:'район',src:'джерело',info:'інфо',rating:'оцінка',date:'дата',lang:'мова',pri:'пріоритет'};
 const CATS = {
-  type:{фото:'фото',photo:'фото',відео:'відео',video:'відео',звіт:'звіт',report:'звіт',допис:'допис',post:'допис',аудіо:'аудіо',audio:'аудіо',карта:'карта',map:'карта',схема:'карта'},
+  type:{фото:'фото',photo:'фото',відео:'відео',video:'відео',звіт:'звіт',report:'звіт',допис:'допис',post:'допис',аудіо:'аудіо',audio:'аудіо',карта:'карта',map:'карта',схема:'карта',scheme:'карта'},
   reg:{північ:'Північ',north:'Північ',південь:'Південь',south:'Південь',схід:'Схід',east:'Схід',захід:'Захід',west:'Захід'},
-  lang:{укр:'укр',українська:'укр',ua:'укр',uk:'укр',англ:'англ',англійська:'англ',en:'англ',інша:'інша',other:'інша'},
+  lang:{укр:'укр',українська:'укр',ua:'укр',uk:'укр',ukr:'укр',ukrainian:'укр',англ:'англ',англійська:'англ',en:'англ',eng:'англ',english:'англ',інша:'інша',other:'інша'},
   pri:{високий:'високий',high:'високий',середній:'середній',medium:'середній',низький:'низький',low:'низький'}
 };
-const CAT_LIST = {type:'фото, відео, звіт, допис, аудіо, карта',reg:'Північ, Південь, Схід, Захід',lang:'укр, англ, інша',pri:'високий, середній, низький'};
 
 function tokenize(q){
   const t=[]; let i=0;
@@ -402,17 +484,17 @@ function cmp(op,a,b){
 
 function fieldTerm(rawName,rawVal){
   const f=FIELDS[norm(rawName)];
-  if(!f) throw E(`Невідоме поле «${rawName}». Доступні: тип, район, джерело, інфо, оцінка, дата, мова, пріоритет.`);
+  if(!f) throw E(`Невідоме поле «${rawName}». Доступні: ${FIELD_ORDER.map(x=>fieldName(x)).join(', ')}.`);
   if(!rawVal) throw E(`Після «${rawName}:» вкажіть значення.`);
   const m=rawVal.match(/^(<=|>=|<|>|=)?(.*)$/); const op=m[1]||'='; let v=m[2];
   if(!v) throw E(`Після «${rawName}:${op}» вкажіть значення.`);
   const range = v.includes('..') ? v.split('..') : null;
-  if(range && (op!=='=' || range.length!==2 || !range[0] || !range[1])) throw E('Діапазон записується як «від..до», наприклад інфо:2..3.');
+  if(range && (op!=='=' || range.length!==2 || !range[0] || !range[1])) throw E(`Діапазон записується як «від..до», наприклад ${T('інфо:2..3')}.`);
 
   if(CATS[f]){
-    if(op!=='='||range) throw E(`Поле «${FIELD_UA[f]}» не впорядковане: порівняння та діапазони для нього не працюють.`);
+    if(op!=='='||range) throw E(`Поле «${fieldName(f)}» не впорядковане: порівняння та діапазони для нього не працюють.`);
     const val=CATS[f][norm(v)];
-    if(!val) throw E(`Невідоме значення «${v}» для поля «${FIELD_UA[f]}». Можливі: ${CAT_LIST[f]}.`);
+    if(!val) throw E(`Невідоме значення «${v}» для поля «${fieldName(f)}». Можливі: ${Object.keys(EN_VAL[f]).map(x=>valName(f,x)).join(', ')}.`);
     return c=>c[f]===val;
   }
   if(f==='src'){
@@ -426,7 +508,7 @@ function fieldTerm(rawName,rawVal){
     const n=conv(v); return c=>cmp(op,c.info,n);
   }
   if(f==='rating'){
-    if(op!=='='||range) throw E('Для порівнянь використовуйте окремо джерело: та інфо:, наприклад джерело:<=B інфо:<=2.');
+    if(op!=='='||range) throw E(`Для порівнянь використовуйте окремо ${fieldName('src')}: та ${fieldName('info')}:, наприклад ${T('джерело:<=B інфо:<=2')}.`);
     const s=normLetter(v); if(!/^[A-F][1-6]$/.test(s)) throw E('Оцінка записується як літера та цифра, наприклад B2.');
     return c=>c.src===s[0]&&c.info===+s[1];
   }
@@ -467,8 +549,8 @@ function parse(q){
     if(t.k==='not'){p++; const f=parseUnary(); return c=>!f(c);}
     if(t.k==='('){p++; const f=parseOr(); if(!peek()||peek().k!==')') throw E('Не закрито дужку «(».'); p++; return f;}
     if(t.k===')') throw E('Зайва дужка «)» або порожні дужки.');
-    if(t.k==='or') throw E('АБО має стояти між двома умовами.');
-    if(t.k==='and') throw E('І має стояти між двома умовами.');
+    if(t.k==='or') throw E(`${OPS[cmd()].or} має стояти між двома умовами.`);
+    if(t.k==='and') throw E(`${OPS[cmd()].and} має стояти між двома умовами.`);
     p++;
     if(t.k==='phrase'){ const v=norm(t.v); if(!v.trim()) throw E('Порожні лапки.'); return c=>norm(c.title).includes(v);}
     return term(t.v);
@@ -478,13 +560,54 @@ function parse(q){
   return f;
 }
 
+/* ================== МОВА КОМАНД (УКР / ENG) ================== */
+const EN_FIELD = {type:'type',reg:'region',src:'source',info:'info',rating:'rating',date:'date',lang:'lang',pri:'priority'};
+const EN_VAL = {
+  type:{фото:'photo',відео:'video',звіт:'report',допис:'post',аудіо:'audio',карта:'map'},
+  reg:{Північ:'North',Південь:'South',Схід:'East',Захід:'West'},
+  lang:{укр:'ua',англ:'en',інша:'other'},
+  pri:{високий:'high',середній:'medium',низький:'low'}
+};
+const OPS = {ua:{or:'АБО',and:'І',not:'НЕ'},en:{or:'OR',and:'AND',not:'NOT'}};
+const FIELD_ORDER = ['type','reg','src','info','rating','date','lang','pri'];
+const cmd = () => state.cmd==='en'?'en':'ua';
+const fieldName = (f,lang=cmd()) => lang==='en'?EN_FIELD[f]:FIELD_UA[f];
+const valName = (f,v,lang=cmd()) => lang==='en'&&EN_VAL[f]?EN_VAL[f][v]:v;
+
+// Перекладає оператори, назви полів і значення; текст для пошуку в заголовку не змінюється.
+function toLang(q,lang){
+  return q.replace(/"[^"]*"|«[^»]*»|[^\s()"«»]+/g,w=>{
+    if(/^["«]/.test(w)) return w;
+    const neg=w.length>1&&/^[-!]/.test(w)?w[0]:''; const b=w.slice(neg.length);
+    const up=b.toUpperCase();
+    if(up==='АБО'||up==='OR') return neg+OPS[lang].or;
+    if(up==='І'||up==='ТА'||up==='AND') return neg+OPS[lang].and;
+    if(up==='НЕ'||up==='NOT') return neg+OPS[lang].not;
+    const k=b.indexOf(':'); if(k<=0) return w;
+    const f=FIELDS[norm(b.slice(0,k))]; if(!f) return w;
+    let v=b.slice(k+1);
+    const canon=CATS[f]&&CATS[f][norm(v)];
+    if(canon){const t=valName(f,canon,lang); v=v===v.toLowerCase()?t.toLowerCase():t;}
+    return neg+fieldName(f,lang)+':'+v;
+  });
+}
+function T(q){return toLang(q,cmd());}
+// Для фрагментів <code> у тексті уроку: окремі значення полів теж перекладаються.
+function codeLang(t){
+  if(cmd()==='ua') return t;
+  if(t==='поле:значення') return 'field:value';
+  for(const f in EN_VAL) if(t in EN_VAL[f]) return EN_VAL[f][t];
+  return toLang(t,'en');
+}
+
 /* ================== СТАН ================== */
 const STORE='kartoteka-progress-v1';
-let state={level:0,done:{}};
+let state={level:0,done:{},cmd:'ua'};
 try{const s=JSON.parse(localStorage.getItem(STORE)); if(s&&typeof s.level==='number') state=Object.assign(state,s);}catch(e){}
 const save=()=>{try{localStorage.setItem(STORE,JSON.stringify(state))}catch(e){}};
+const resetProgress=()=>{state={level:0,done:{},cmd:state.cmd}; save(); closeMenu(); loadLevel(0);};
 
-let cards=[], target=new Set(), busy=false;
+let cards=[], target=new Set(), busy=false, hintN=0;
 
 const ICONS={
  'фото':'<rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/>',
@@ -501,20 +624,75 @@ const esc=s=>s.replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&q
 
 function loadLevel(n){
   n=Math.max(0,Math.min(LEVELS.length-1,n));
-  state.level=n; save(); busy=false;
+  state.level=n; save(); busy=false; hintN=0;
   const L=LEVELS[n];
   cards=L.cards.map(byId);
   const f=parse(L.sol); target=new Set(cards.filter(f).map(c=>c.id));
 
+  renderText(); renderCards();
+  $('q').value=''; setFb('',''); preview();
+  $('q').focus({preventScroll:true});
+}
+
+function renderText(){
+  const n=state.level, L=LEVELS[n], en=cmd()==='en';
   $('menuBtn').textContent=`Рівень ${n+1} / ${LEVELS.length}`;
   $('task').textContent=L.task;
   $('lnum').textContent=`Рівень ${n+1}`+(state.done[n]?' · пройдено':'');
   $('ltitle').textContent=L.title;
-  $('lsyntax').textContent=L.syntax;
+  $('lsyntax').textContent=en&&L.syntaxEn?L.syntaxEn:T(L.syntax);
   $('lbody').innerHTML=L.body;
-  $('lex').innerHTML=L.ex.map(([c,d])=>`<div><code>${esc(c)}</code> — ${d}</div>`).join('');
+  // команди в тексті уроку показуємо обраною мовою, якщо цей варіант ще не згадано в тексті
+  $('lbody').querySelectorAll('code').forEach(el=>{const t=el.textContent,v=codeLang(t); if(v!==t&&!L.body.includes(`<code>${esc(v)}</code>`)) el.textContent=v;});
+  $('lex').innerHTML=L.ex.map(([c,d])=>`<div><code>${esc(T(c))}</code> — ${d}</div>`).join('');
   $('prog').style.width=(Object.keys(state.done).length/LEVELS.length*100)+'%';
+  document.querySelectorAll('#cmdSeg button').forEach(b=>b.classList.toggle('on',b.dataset.cmd===cmd()));
+  $('promptLbl').textContent=en?'QUERY>':'ЗАПИТ>';
+  $('q').placeholder=(en?'e.g. ':'наприклад: ')+T('тип:фото');
+  renderHints(); renderCheat();
+}
 
+function renderHints(){
+  const H=LEVELS[state.level].hints;
+  $('hints').innerHTML=H.slice(0,hintN).map((h,i)=>`<div class="hint"><b>${i+1}/${H.length}</b>${
+    h.split(/\{\{(.*?)\}\}/).map((s,j)=>j%2?`<code>${esc(T(s))}</code>`:esc(s)).join('')}</div>`).join('');
+  const b=$('tip');
+  b.disabled=hintN>=H.length;
+  b.textContent=hintN>=H.length?'Підказки вичерпано':hintN?`Ще підказка (${hintN+1}/${H.length})`:`Підказка (1/${H.length})`;
+}
+
+function renderCheat(){
+  const en=cmd()==='en', o=OPS[cmd()];
+  const rows=[
+    ['слово','частина слова в заголовку'+(en?' (українською, як на картках)':'')],
+    ['"фраза"','точний збіг фрази'],
+    [`A B, A ${o.and} B`,'обидві умови'],
+    [`A ${o.or} B`,'будь-яка з умов'],
+    [`-A, ${o.not} A`,'виключити'],
+    ['( … )','групування'],
+    [en?'field:value':'поле:знач',FIELD_ORDER.map(f=>fieldName(f)).join(', ')],
+    ['< <= > >= ..','порівняння та діапазон']];
+  $('cheatTbl').innerHTML=rows.map(([a,b])=>`<tr><td>${esc(a)}</td><td>${esc(b)}</td></tr>`).join('');
+}
+
+function renderDict(){
+  const rows=[['АБО','OR'],['І, ТА','AND'],['НЕ','NOT']];
+  FIELD_ORDER.forEach(f=>{
+    rows.push([FIELD_UA[f]+':',EN_FIELD[f]+':']);
+    if(EN_VAL[f]) rows.push(['  '+Object.keys(EN_VAL[f]).join(', '),'  '+Object.values(EN_VAL[f]).join(', ')]);
+  });
+  $('dictTbl').innerHTML=`<tr><th>УКР</th><th>ENG</th></tr>`+rows.map(([a,b])=>`<tr><td>${esc(a)}</td><td>${esc(b)}</td></tr>`).join('');
+}
+
+function setCmd(lang){
+  if(cmd()===lang) return;
+  state.cmd=lang; save();
+  $('q').value=toLang($('q').value,lang);
+  renderText(); renderCards(); preview();
+  $('q').focus();
+}
+
+function renderCards(){
   const desk=$('desk');
   desk.querySelectorAll('.card').forEach(e=>e.remove());
   cards.forEach((c,i)=>{
@@ -523,23 +701,23 @@ function loadLevel(n){
     el.dataset.id=c.id;
     el.style.setProperty('--rot',(((c.id*37+i*11)%7)-3)*0.6+'deg');
     if(target.has(c.id)) el.style.animationDelay=(i*0.13)+'s';
-    el.innerHTML=`<div class="row"><span class="ico"><svg viewBox="0 0 24 24">${ICONS[c.type]}</svg></span><span class="type">${c.type}</span><span class="num">№${String(c.id).padStart(2,'0')}</span></div>
+    el.innerHTML=`<div class="row"><span class="ico"><svg viewBox="0 0 24 24">${ICONS[c.type]}</svg></span><span class="type">${valName('type',c.type)}</span><span class="num">№${String(c.id).padStart(2,'0')}</span></div>
       <div class="row"><span class="badge" style="background:${SRC_COL[c.src]}" title="Джерело: ${SRC_TXT[c.src]}; інформація: ${INFO_TXT[c.info]}">${c.src}${c.info}</span>${c.pri==='високий'?'<span class="pri-h" style="font-size:11px">● терміново</span>':''}</div>
       <div class="ttl">${esc(c.title)}</div>
-      <div class="meta"><span>${c.reg}</span><span>${c.date}</span><span>${c.lang}</span></div>`;
+      <div class="meta"><span>${valName('reg',c.reg)}</span><span>${c.date}</span><span>${valName('lang',c.lang)}</span></div>`;
     el.addEventListener('mouseenter',()=>link(c.id,true));
     el.addEventListener('mouseleave',()=>link(c.id,false));
     desk.appendChild(el);
   });
 
-  $('recList').innerHTML=cards.map(c=>`<div class="rec" data-id="${c.id}"><span class="rid">№${String(c.id).padStart(2,'0')}</span><span><span class="rk">тип:</span><span class="rv">${c.type}</span> <span class="rk">джерело:</span><span class="rv">${c.src}</span> <span class="rk">інфо:</span><span class="rv">${c.info}</span> <span class="rk">район:</span><span class="rv">${c.reg}</span> <span class="rk">дата:</span><span class="rv">${c.date}</span> <span class="rk">мова:</span><span class="rv">${c.lang}</span> <span class="rk">пріоритет:</span><span class="rv">${c.pri}</span></span><span class="rt">«${esc(c.title)}»</span></div>`).join('');
+  const kv=(f,v)=>`<span class="rk">${fieldName(f)}:</span><span class="rv">${valName(f,v)}</span>`;
+  $('recList').innerHTML=cards.map(c=>`<div class="rec" data-id="${c.id}"><span class="rid">№${String(c.id).padStart(2,'0')}</span><span>${
+    [kv('type',c.type),kv('src',c.src),kv('info',c.info),kv('reg',c.reg),kv('date',c.date),kv('lang',c.lang),kv('pri',c.pri)].join(' ')
+  }</span><span class="rt">«${esc(c.title)}»</span></div>`).join('');
   $('recList').querySelectorAll('.rec').forEach(r=>{
     r.addEventListener('mouseenter',()=>link(+r.dataset.id,true));
     r.addEventListener('mouseleave',()=>link(+r.dataset.id,false));
   });
-
-  $('q').value=''; setFb('',''); preview();
-  $('q').focus({preventScroll:true});
 }
 
 function link(id,on){
@@ -596,7 +774,7 @@ function submit(){
 function shakeEditor(){const ed=$('editor'); ed.classList.remove('shake'); void ed.offsetWidth; ed.classList.add('shake');}
 
 function openMenu(){
-  let html=`<h2>Рівні</h2><p>Пройдено ${Object.keys(state.done).length} з ${LEVELS.length}. Жовта позначка означає, що рівень пройдено з підказкою.</p><div class="lv-grid">`;
+  let html=`<h2>Рівні</h2><p>Пройдено ${Object.keys(state.done).length} з ${LEVELS.length}. Жовта позначка означає, що рівень пройдено з готовою відповіддю.</p><div class="lv-grid">`;
   LEVELS.forEach((L,i)=>{
     if(L.part) html+=`<div class="part">${L.part}</div>`;
     const d=state.done[i];
@@ -606,7 +784,7 @@ function openMenu(){
   $('panel').innerHTML=html; $('overlay').classList.add('open');
   $('panel').querySelectorAll('.lv-item').forEach(b=>b.onclick=()=>{closeMenu(); loadLevel(+b.dataset.l);});
   $('closeM').onclick=closeMenu;
-  $('reset').onclick=()=>{ state={level:0,done:{}}; save(); closeMenu(); loadLevel(0); };
+  $('reset').onclick=resetProgress;
 }
 function closeMenu(){$('overlay').classList.remove('open');}
 
@@ -614,7 +792,7 @@ function finale(){
   const hints=Object.values(state.done).filter(v=>v==='hint').length;
   $('panel').innerHTML=`<div class="finale"><div class="lesson-n">Навчання завершено</div><div class="big">Картотеку опановано</div><p>Ви пройшли ${Object.keys(state.done).length} з ${LEVELS.length} рівнів${hints?`, з них ${hints} з підказкою`:' без жодної підказки'}.</p><p>Тепер ви вмієте шукати за основою слова й точною фразою, поєднувати умови через І, АБО, НЕ та дужки, а також фільтрувати матеріали за адміралтейською оцінкою, датою та іншими полями.</p></div><div class="row"><button class="btn ghost" id="again">Почати спочатку</button><button class="btn" id="toMenu">До переліку рівнів</button></div>`;
   $('overlay').classList.add('open');
-  $('again').onclick=()=>{state={level:0,done:{}}; save(); closeMenu(); loadLevel(0);};
+  $('again').onclick=resetProgress;
   $('toMenu').onclick=openMenu;
 }
 
@@ -622,13 +800,16 @@ $('q').addEventListener('input',preview);
 $('q').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();submit();}});
 $('run').onclick=submit;
 $('clear').onclick=()=>{$('q').value=''; preview(); $('q').focus();};
-$('hint').onclick=()=>{ $('q').value=LEVELS[state.level].sol; if(!state.done[state.level]) state.done[state.level]='hint'; save(); preview(); setFb('Підказку вставлено. Розберіть запит і натисніть Enter.',''); $('q').focus(); };
+$('tip').onclick=()=>{ hintN=Math.min(hintN+1,LEVELS[state.level].hints.length); renderHints(); $('q').focus(); };
+document.querySelectorAll('#cmdSeg button').forEach(b=>b.onclick=()=>setCmd(b.dataset.cmd));
+$('hint').onclick=()=>{ $('q').value=T(LEVELS[state.level].sol); if(!state.done[state.level]) state.done[state.level]='hint'; save(); preview(); setFb('Підказку вставлено. Розберіть запит і натисніть Enter.',''); $('q').focus(); };
 $('prev').onclick=()=>loadLevel(state.level-1);
 $('next').onclick=()=>loadLevel(state.level+1);
 $('menuBtn').onclick=openMenu;
 $('overlay').addEventListener('click',e=>{if(e.target.id==='overlay') closeMenu();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape') closeMenu();});
 
+renderDict();
 loadLevel(state.level);
 </script>
 </body>
