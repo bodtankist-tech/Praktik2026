@@ -1,5 +1,5 @@
 // Фото та відео з Wikimedia Commons (вільні ліцензії). Згенеровано автоматично.
-// Ключ: c01…c48 — картка з тим самим номером, ref-* — довідник розпізнавання.
+// Ключ: c01…c54 — знімок картки з тим самим номером, ref-* — довідник розпізнавання.
 const MEDIA = {
  "c01": {
   "title": "KrAZ military truck.JPG",
@@ -200,6 +200,48 @@ const MEDIA = {
   "page": "https://commons.wikimedia.org/wiki/File:HIMARS_Support_Operation_Epic_Fury_(998176).webm",
   "video": true
  },
+ "c49": {
+  "title": "Gepard spaa in ukrainian service.jpg",
+  "author": "Air Force Command of UA Armed Forces",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Gepard_spaa_in_ukrainian_service.jpg"
+ },
+ "c50": {
+  "title": "Buk-M1, Kyiv 2018, 44.jpg",
+  "author": "VoidWanderer",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Buk-M1,_Kyiv_2018,_44.jpg"
+ },
+ "c51": {
+  "title": "Ukrainian military parade with S-300P launchers.jpg",
+  "author": "Michael",
+  "license": "CC BY 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Ukrainian_military_parade_with_S-300P_launchers.jpg"
+ },
+ "c52": {
+  "title": "Ukrainian helicopters Mil Mi-24 in the sky.jpg",
+  "author": "автор не вказаний",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Ukrainian_helicopters_Mil_Mi-24_in_the_sky.jpg"
+ },
+ "c53": {
+  "title": "Ukrainian army Mi-8.jpg",
+  "author": "Alex125visitor",
+  "license": "CC BY-SA 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Ukrainian_army_Mi-8.jpg"
+ },
+ "c54": {
+  "title": "Ukrainian soldiers fast rope from a MI-8 helicopter (6849399).jpg",
+  "author": "U.S. Army 81SBCT by Staff Sgt. David Carnahan",
+  "license": "Public domain",
+  "licenseUrl": "",
+  "page": "https://commons.wikimedia.org/wiki/File:Ukrainian_soldiers_fast_rope_from_a_MI-8_helicopter_(6849399).jpg"
+ },
  "ref-apc": {
   "title": "BTR-4, Kyiv 2021, 20.jpg",
   "author": "VoidWanderer",
@@ -207,12 +249,26 @@ const MEDIA = {
   "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
   "page": "https://commons.wikimedia.org/wiki/File:BTR-4,_Kyiv_2021,_20.jpg"
  },
+ "ref-heli": {
+  "title": "Mi-24 ukraine army.jpg",
+  "author": "Alex125visitor",
+  "license": "CC BY-SA 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Mi-24_ukraine_army.jpg"
+ },
  "ref-mlrs": {
   "title": "UA 36th bde BM-21 Grad.jpg",
   "author": "АрміяInform",
   "license": "CC BY 4.0",
   "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
   "page": "https://commons.wikimedia.org/wiki/File:UA_36th_bde_BM-21_Grad.jpg"
+ },
+ "ref-sam": {
+  "title": "9A33BM3 Osa-AKM of Ukraine.jpg",
+  "author": "Michael Esspe",
+  "license": "CC BY 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:9A33BM3_Osa-AKM_of_Ukraine.jpg"
  },
  "ref-spg": {
   "title": "Ukrainian 2S1 Gvozdika SPG.jpg",
