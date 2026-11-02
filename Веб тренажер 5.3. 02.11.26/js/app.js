@@ -58,6 +58,49 @@ const SND=(()=>{
 const ICON_SND_ON='<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>';
 const ICON_SND_OFF='<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
 
+/* ================== «ЖИВІ ШПАЛЕРИ» ДОШКИ: ЦИФРОВИЙ ДОЩ ================== */
+const RAIN=(()=>{
+  const cv=$('rain'), ctx=cv.getContext('2d'), desk=$('desk');
+  const CH='アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ЖЗИЛФЦЧШЮЯ';
+  const FS=16, BG='5,12,8';
+  let drops=[], w=0, h=0, raf=0, last=0, goldUntil=0, on=false;
+  const rnd=()=>CH[Math.random()*CH.length|0];
+  function resize(){
+    const r=desk.getBoundingClientRect(), dpr=Math.min(2,window.devicePixelRatio||1);
+    w=r.width; h=r.height; cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr); ctx.setTransform(dpr,0,0,dpr,0,0);
+    drops=Array.from({length:Math.ceil(w/FS)},(_,i)=>drops[i]??-Math.random()*h/FS);
+    ctx.fillStyle=`rgb(${BG})`; ctx.fillRect(0,0,w,h);
+  }
+  function frame(ts){
+    raf=requestAnimationFrame(frame);
+    if(ts-last<50) return; // близько 20 кадрів на секунду
+    last=ts;
+    const gold=Date.now()<goldUntil;
+    ctx.fillStyle=`rgba(${BG},.11)`; ctx.fillRect(0,0,w,h); // затухання дає «хвіст»
+    ctx.font=`${FS}px "JetBrains Mono", monospace`; ctx.textBaseline='top';
+    for(let i=0;i<drops.length;i++){
+      const x=i*FS, y=drops[i]*FS;
+      ctx.fillStyle=gold?'#e8b934':'rgba(59,209,111,.8)'; ctx.fillText(rnd(),x,y-FS); // хвіст
+      ctx.fillStyle=gold?'#ffd75e':'#d6ffe2'; ctx.fillText(rnd(),x,y);              // яскрава «голова»
+      if(y>h&&Math.random()>.97) drops[i]=-Math.random()*8;
+      drops[i]+=gold?1.7:1;
+    }
+  }
+  const run=()=>{ cancelAnimationFrame(raf); raf=requestAnimationFrame(frame); };
+  new ResizeObserver(()=>{ if(on) resize(); }).observe(desk);
+  document.addEventListener('visibilitychange',()=>{ if(document.hidden) cancelAnimationFrame(raf); else if(on) run(); });
+  return {
+    get on(){ return on; },
+    start(){ if(on) return; on=true; desk.classList.add('rain'); resize(); run(); },
+    stop(){ on=false; cancelAnimationFrame(raf); desk.classList.remove('rain'); ctx.clearRect(0,0,w,h); },
+    flash(){ goldUntil=Date.now()+1300; } // золотий дощ після правильної відповіді
+  };
+})();
+// За замовчуванням увімкнено, якщо в системі не обрано «зменшити анімацію».
+const rainWanted=()=>state.rain!=null?state.rain:!matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ICON_RAIN_ON='<svg viewBox="0 0 24 24"><path d="M6 3v6M6 13v2M12 6v8M12 18v2M18 3v4M18 11v6"/></svg>';
+const ICON_RAIN_OFF='<svg viewBox="0 0 24 24"><path d="M6 3v6M6 13v2M12 6v8M12 18v2M18 3v4M18 11v6" opacity=".4"/><path d="M4 4l16 16"/></svg>';
+
 /* ================== БАЛИ, ЗВАННЯ, НАГОРОДИ ================== */
 // За рівень: 100 − 15 за підказку − 10 за хибну спробу (не менше 20), +20 до 30 с, +10 до 60 с; з готовою відповіддю 10.
 const RANKS=[[0,'rank.0'],[400,'rank.1'],[1200,'rank.2'],[2200,'rank.3'],[3100,'rank.4']];
@@ -75,6 +118,8 @@ function renderStats(pop){
   if(pop){const c=$('scoreChip'); c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop');}
   $('soundBtn').innerHTML=state.sound===false?ICON_SND_OFF:ICON_SND_ON;
   $('soundBtn').title=t(state.sound===false?'sound.on':'sound.off');
+  $('rainBtn').innerHTML=RAIN.on?ICON_RAIN_ON:ICON_RAIN_OFF;
+  $('rainBtn').title=t(RAIN.on?'rain.off':'rain.on');
 }
 function toast(title,sub,icon){
   const el=document.createElement('div'); el.className='toast';
@@ -148,7 +193,7 @@ function renderText(){
   $('lnum').textContent=t('nav.levelShort',{n:n+1})+(!exam&&state.done[n]?' · '+t('lvl.done'):'')+(!exam&&state.score[n]?` · ★ ${state.score[n]}`:'');
   $('ltitle').textContent=loc(L,'title');
   $('lpart').textContent=loc(L.blockPart,'part');
-  $('lsyntax').textContent=en&&L.syntaxEn?L.syntaxEn:ui()==='en'&&L.syntaxEn?L.syntaxEn:T(L.syntax);
+  $('lsyntax').innerHTML=highlight(en&&L.syntaxEn?L.syntaxEn:ui()==='en'&&L.syntaxEn?L.syntaxEn:T(L.syntax));
   let body=loc(L,'body').replace('{ADM_SRC}',admTable(SRC_TXT)).replace('{ADM_INFO}',admTable(INFO_TXT))
     .replace('{SIM}',SIM_MIN.toFixed(2)).replace('{GUIDE}',L.guide?guideHtml(L.guide):'');
   if(exam) body=L.guide?guideHtml(L.guide):''; // на заліку без пояснень, лише довідник
@@ -156,7 +201,7 @@ function renderText(){
   // команди в тексті уроку показуємо обраною мовою, якщо цей варіант ще не згадано в тексті
   $('lbody').querySelectorAll('code').forEach(el=>{const x=el.textContent,v=codeLang(x); if(v!==x&&!body.includes(`<code>${esc(v)}</code>`)) el.textContent=v;});
   $('lbody').querySelectorAll('figure[data-eq]').forEach(f=>f.onclick=()=>openRef(f.dataset.eq));
-  $('lex').innerHTML=L.ex.map(([c,d,dEn])=>`<div><code>${esc(T(c))}</code> — ${esc(ui()==='en'?dEn:d)}</div>`).join('');
+  $('lex').innerHTML=L.ex.map(([c,d,dEn])=>`<div><code>${highlight(T(c))}</code> — ${esc(ui()==='en'?dEn:d)}</div>`).join('');
   $('prog').style.width=(Object.keys(state.done).length/LEVELS.length*100)+'%';
   document.querySelectorAll('#cmdSeg button').forEach(b=>b.classList.toggle('on',b.dataset.cmd===cmd()));
   $('promptLbl').textContent=t('editor.prompt');
@@ -168,7 +213,7 @@ function renderText(){
 function renderHints(){
   const H=LEVELS[curLevel].hints;
   $('hints').innerHTML=exam?'':H.slice(0,hintN).map((h,i)=>`<div class="hint"><b>${i+1}/${H.length}</b>${
-    (ui()==='en'?h[1]:h[0]).split(/\{\{(.*?)\}\}/).map((s,j)=>j%2?`<code>${esc(T(s))}</code>`:esc(s)).join('')}</div>`).join('');
+    (ui()==='en'?h[1]:h[0]).split(/\{\{(.*?)\}\}/).map((s,j)=>j%2?`<code>${highlight(T(s))}</code>`:esc(s)).join('')}</div>`).join('');
   const b=$('tip');
   b.disabled=hintN>=H.length;
   b.textContent=hintN>=H.length?t('hint.none'):hintN?t('hint.more',{i:hintN+1,n:H.length}):t('hint.first',{n:H.length});
@@ -177,8 +222,8 @@ function renderHints(){
 function renderCheat(){
   const en=cmd()==='en', o=OPS[cmd()];
   const rows=[
-    ['слово',t('cheat.word')],
-    ['"фраза"',t('cheat.phrase')],
+    [ui()==='en'?'word':'слово',t('cheat.word')],
+    [ui()==='en'?'"phrase"':'"фраза"',t('cheat.phrase')],
     [`A B, A ${o.and} B`,t('cheat.and')],
     [`A ${o.or} B`,t('cheat.or')],
     [`-A, ${o.not} A`,t('cheat.not')],
@@ -187,7 +232,8 @@ function renderCheat(){
     ['< <= > >= ..',t('cheat.cmp')],
     [T('квадрат:4410..4612'),t('cheat.sq')],
     [T('схоже:"…"'),t('cheat.sim')]];
-  $('cheatTbl').innerHTML=rows.map(([a,b])=>`<tr><td>${esc(a)}</td><td>${esc(b)}</td></tr>`).join('');
+  // «поле:знач» у шпаргалці — шаблон запису, а не помилка, тож без червоного підкреслення
+  $('cheatTbl').innerHTML=rows.map(([a,b])=>`<tr><td>${highlight(a).replace(/h-bad/g,'h-field')}</td><td>${esc(b)}</td></tr>`).join('');
 }
 
 function renderDict(){
@@ -330,7 +376,11 @@ function evaluate(){
   return {ast,set:new Set(cards.filter(c=>run(ast,c)).map(c=>c.id))};
 }
 
+// Кольоровий шар під полем запиту: той самий текст, розфарбований як код.
+function syncHL(){ $('qhl').innerHTML=highlight($('q').value)+' '; $('qhl').scrollLeft=$('q').scrollLeft; }
+
 function preview(){
+  syncHL();
   const els=[...document.querySelectorAll('.desk .card, #map .m-mark')];
   els.forEach(e=>{e.classList.remove('hit','wrong','missed'); e.removeAttribute('data-why');});
   let r;
@@ -392,7 +442,7 @@ function success(){
   busy=true;
   const n=curLevel, secs=Math.round((Date.now()-t0)/1000), clean=!usedAnswer&&!hintN&&!wrongN;
   const {pts,why}=levelPoints(secs);
-  SND.ok();
+  SND.ok(); RAIN.flash();
   if(exam){
     // для оцінки рахуємо бали без бонусу за швидкість: максимум 100 за завдання
     exam.results.push({lv:n,ok:true,wrong:wrongN,secs,pts,base:Math.max(20,100-10*wrongN)});
@@ -448,7 +498,7 @@ function openMenu(){
   $('reset').onclick=()=>{ if(confirm(t('menu.resetq'))) resetProgress(); };
   $('mExam').onclick=examDialog; $('mGroup').onclick=openGroup; $('mExams').onclick=openMyExams;
 }
-const resetProgress=()=>{state={...DEFAULT_STATE,cmd:state.cmd,ui:state.ui,sound:state.sound,exams:state.exams,group:state.group}; save(); closeMenu(); renderStats(); loadLevel(0);};
+const resetProgress=()=>{state={...DEFAULT_STATE,cmd:state.cmd,ui:state.ui,sound:state.sound,rain:state.rain,exams:state.exams,group:state.group}; save(); closeMenu(); renderStats(); loadLevel(0);};
 
 function finale(){
   const hints=Object.values(state.done).filter(v=>v==='hint').length;
@@ -584,6 +634,7 @@ function openGroup(){
 
 /* ================== ПОДІЇ ================== */
 $('q').addEventListener('input',preview);
+['scroll','keyup','keydown','select','click','focus'].forEach(ev=>$('q').addEventListener(ev,()=>requestAnimationFrame(()=>{$('qhl').scrollLeft=$('q').scrollLeft;})));
 $('q').addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();submit();} else if(e.key.length===1) SND.key(); });
 $('run').onclick=submit;
 $('clear').onclick=()=>{$('q').value=''; preview(); $('q').focus();};
@@ -599,6 +650,7 @@ $('credBtn').onclick=openCredits;
 $('examSkip').onclick=examSkip;
 $('examEnd').onclick=()=>{ if(confirm(t('exam.endq'))) finishExam(false); };
 $('soundBtn').onclick=()=>{ state.sound=state.sound===false; save(); renderStats(); SND.click(); };
+$('rainBtn').onclick=()=>{ state.rain=!RAIN.on; save(); state.rain?RAIN.start():RAIN.stop(); renderStats(); SND.click(); };
 $('overlay').addEventListener('click',e=>{if(e.target.id==='overlay') closeMenu();});
 $('viewer').addEventListener('click',e=>{if(e.target.id==='viewer') closeViewer();});
 $('vclose').onclick=closeViewer;
@@ -606,6 +658,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if($('viewer').cl
 
 applyStatic();
 renderDict();
+if(rainWanted()) RAIN.start();
 renderStats();
 setInterval(tick,1000);
 loadLevel(state.level);

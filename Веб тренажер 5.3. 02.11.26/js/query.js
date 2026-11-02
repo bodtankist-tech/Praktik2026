@@ -36,15 +36,15 @@ const CATS = {
   lang:{укр:'укр',українська:'укр',ua:'укр',uk:'укр',ukr:'укр',ukrainian:'укр',англ:'англ',англійська:'англ',en:'англ',eng:'англ',english:'англ',інша:'інша',other:'інша'},
   pri:{високий:'високий',high:'високий',середній:'середній',medium:'середній',низький:'низький',low:'низький'},
   equip:{танк:'танк',tank:'танк',бтр:'бтр',apc:'бтр',сау:'сау',spg:'сау',рсзв:'рсзв',mlrs:'рсзв',вантажівка:'вантажівка',truck:'вантажівка',
-    бпла:'бпла',uav:'бпла',дрон:'бпла',drone:'бпла',ппо:'ппо',sam:'ппо',гелікоптер:'гелікоптер',helicopter:'гелікоптер',heli:'гелікоптер',вертоліт:'гелікоптер'},
+    бпла:'бпла',uav:'бпла',дрон:'бпла',drone:'бпла',ппо:'ппо',ad:'ппо',sam:'ппо',airdefence:'ппо',aa:'ппо',гелікоптер:'гелікоптер',helicopter:'гелікоптер',heli:'гелікоптер',вертоліт:'гелікоптер'},
   meta:{є:'є',present:'є',intact:'є',видалено:'видалено',removed:'видалено',stripped:'видалено',змінено:'змінено',edited:'змінено',modified:'змінено'}
 };
 const EN_VAL = {
   type:{фото:'photo',відео:'video',звіт:'report',допис:'post',аудіо:'audio',карта:'map'},
   reg:{Північ:'North',Південь:'South',Схід:'East',Захід:'West'},
-  lang:{укр:'ua',англ:'en',інша:'other'},
+  lang:{укр:'uk',англ:'en',інша:'other'},
   pri:{високий:'high',середній:'medium',низький:'low'},
-  equip:{танк:'tank',бтр:'apc',сау:'spg',рсзв:'mlrs',вантажівка:'truck',бпла:'uav',ппо:'sam',гелікоптер:'heli'},
+  equip:{танк:'tank',бтр:'apc',сау:'spg',рсзв:'mlrs',вантажівка:'truck',бпла:'uav',ппо:'ad',гелікоптер:'heli'},
   meta:{є:'present',видалено:'removed',змінено:'edited'}
 };
 const OPS = {ua:{or:'АБО',and:'І',not:'НЕ'},en:{or:'OR',and:'AND',not:'NOT'}};
@@ -213,6 +213,34 @@ function whyNot(n,c){
   if(n.k==='and') return [...(run(n.a,c)?[]:whyNot(n.a,c)),...(run(n.b,c)?[]:whyNot(n.b,c))];
   if(n.k==='or') return [t('why.or',{list:orParts(n).map(x=>'«'+T(label(x).replace(/^\((.*)\)$/,'$1'))+'»').join(' / ')})];
   return [t('why.not',{q:T(label(n.a))})];
+}
+
+/* ---------- підсвічування синтаксису (як у редакторі коду) ---------- */
+// Повертає HTML: кожен фрагмент запиту в <span class="h-…">; пробіли зберігаються, щоб шар збігався з полем введення.
+const KW_RE=/^(АБО|OR|І|ТА|AND|НЕ|NOT|\|\||&&|\||&)$/i;
+function highlight(q){
+  const e=s=>s.replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  const sp=(cls,s)=>s?`<span class="h-${cls}">${e(s)}</span>`:'';
+  const valCls=v=>/^[\d#]/.test(v)||(v.length<=2&&/^[A-FАВСЕДФБ][1-6]?$/i.test(v))?'num':'val';
+  const re=/(\s+)|(["«“„][^"»”“]*["»”“]?)|([()])|([^\s()"«“„]+)/y;
+  let out='', depth=0, m;
+  re.lastIndex=0;
+  while(re.lastIndex<q.length && (m=re.exec(q))){
+    if(m[1]){ out+=m[1]; continue; }
+    if(m[2]){ out+=sp('str',m[2]); continue; }
+    if(m[3]){ if(m[3]==='('){ out+=sp('p'+depth%3,'('); depth++; } else { depth=Math.max(0,depth-1); out+=sp('p'+depth%3,')'); } continue; }
+    let w=m[4];
+    if(w==='-'||w==='!'){ out+=sp('neg',w); continue; }
+    if(/^[-!]/.test(w)){ out+=sp('neg',w[0]); w=w.slice(1); }
+    if(KW_RE.test(w)){ out+=sp('kw',w); continue; }
+    const k=w.indexOf(':');
+    if(k<=0){ out+=sp('word',w); continue; }
+    const name=w.slice(0,k); let rest=w.slice(k+1);
+    out+=sp(FIELDS[norm(name)]?'field':'bad',name)+sp('punc',':');
+    const op=rest.match(/^(<=|>=|<|>|=)/); if(op){ out+=sp('op',op[1]); rest=rest.slice(op[1].length); }
+    out+=rest.split('..').map(v=>sp(valCls(v),v)).join(sp('op','..'));
+  }
+  return out;
 }
 
 /* ---------- переклад команд ---------- */

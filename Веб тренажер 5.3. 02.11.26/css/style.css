@@ -332,3 +332,32 @@ textarea{width:100%;font-family:var(--mono);font-size:12.5px;resize:vertical}
 /* верхня панель переноситься на вузьких екранах (довге звання, кнопка заліку) */
 .stats{flex-wrap:wrap;justify-content:flex-end}
 @media (max-width:560px){ .top>.spacer{display:none} .stats{justify-content:flex-start;width:100%} }
+
+/* ---------- «живі шпалери» дошки: цифровий дощ ---------- */
+.rain-cv{position:absolute;inset:0;width:100%;height:100%;border-radius:inherit;pointer-events:none;z-index:0;opacity:0;transition:opacity .6s}
+.desk.rain{background:radial-gradient(ellipse at 50% 0%,#0d2416,#050c08 70%);box-shadow:inset 0 0 0 1px rgba(80,255,140,.12),inset 0 -14px 30px rgba(0,0,0,.5),0 10px 30px rgba(0,0,0,.35)}
+.desk.rain .rain-cv{opacity:.85}
+.desk .card,.desk .desk-label{z-index:1}
+.desk.rain .desk-label{background:#3bd16f;color:#04140a}
+@media print{.rain-cv{display:none}}
+.desk .card:hover{z-index:2}
+
+/* ---------- кольоровий запит (підсвічування синтаксису) ----------
+   Текст у полі прозорий, видно лише курсор; під ним шар .qhl з тим самим текстом у кольорах. */
+.qwrap{position:relative;flex:1;min-width:0;height:26px}
+#q,.qhl{font:16px/26px var(--mono);letter-spacing:0;padding:0;margin:0;border:0;height:26px;tab-size:4}
+#q{position:relative;z-index:1;width:100%;background:transparent;color:transparent;caret-color:var(--accent);outline:0}
+#q::selection{background:rgba(216,180,90,.35);color:transparent}
+.qhl{position:absolute;inset:0;overflow:hidden;white-space:pre;pointer-events:none;color:var(--ink)}
+.h-field{color:#79b8ff}
+.h-punc{color:#8b949e}
+.h-val{color:#f2cc60}
+.h-num{color:#f0a868}
+.h-str{color:#98c379}
+.h-kw{color:#c792ea;font-weight:600}
+.h-neg{color:#ff7b72;font-weight:600}
+.h-op{color:#56d4dd}
+.h-p0{color:#ffd700}.h-p1{color:#da70d6}.h-p2{color:#179fff}
+.h-word{color:#e9e6da}
+.h-bad{color:#ff7b72;text-decoration:underline wavy #ff7b72;text-underline-offset:3px}
+.syntax .h-word,.ex .h-word,.hint .h-word,.cheat .h-word{color:#e9e6da}
