@@ -60,7 +60,9 @@ const ICON_SND_OFF='<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><p
 
 /* ================== «ЖИВІ ШПАЛЕРИ» ДОШКИ: ЦИФРОВИЙ ДОЩ ================== */
 const RAIN=(()=>{
-  const cv=$('rain'), ctx=cv.getContext('2d'), desk=$('desk');
+  const cv=$('rain'), desk=$('desk');
+  if(!cv||!cv.getContext) return {on:false,start(){},stop(){},flash(){}}; // немає полотна — без дощу, решта працює
+  const ctx=cv.getContext('2d');
   const CH='アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ЖЗИЛФЦЧШЮЯ';
   const FS=16, BG='3,9,13';
   let drops=[], w=0, h=0, raf=0, last=0, goldUntil=0, on=false;
@@ -101,6 +103,26 @@ const rainWanted=()=>state.rain!=null?state.rain:!matchMedia('(prefers-reduced-m
 const ICON_RAIN_ON='<svg viewBox="0 0 24 24"><path d="M6 3v6M6 13v2M12 6v8M12 18v2M18 3v4M18 11v6"/></svg>';
 const ICON_RAIN_OFF='<svg viewBox="0 0 24 24"><path d="M6 3v6M6 13v2M12 6v8M12 18v2M18 3v4M18 11v6" opacity=".4"/><path d="M4 4l16 16"/></svg>';
 
+/* ================== 3D: НАХИЛ ДОШКИ Й КАРТОК ЗА КУРСОРОМ ================== */
+// Стилі — у css/style.css (body.d3). Тут лише кути: --dx/--dy для дошки, --rx/--ry для картки під курсором.
+const d3Wanted=()=>state.d3!=null?state.d3:!matchMedia('(prefers-reduced-motion: reduce)').matches;
+{
+  const desk=$('desk'); let raf=0, ev=null, lastCard=null;
+  const reset=c=>{ if(c){ c.style.removeProperty('--rx'); c.style.removeProperty('--ry'); } };
+  desk.addEventListener('mousemove',e=>{ ev=e; if(raf) return; raf=requestAnimationFrame(()=>{
+    raf=0;
+    if(!document.body.classList.contains('d3')) return;
+    const r=desk.getBoundingClientRect();
+    desk.style.setProperty('--dx',((ev.clientX-r.left)/r.width-.5).toFixed(3));
+    desk.style.setProperty('--dy',((ev.clientY-r.top)/r.height-.5).toFixed(3));
+    const c=ev.target.closest&&ev.target.closest('.card');
+    if(c!==lastCard){ reset(lastCard); lastCard=c; }
+    if(c){ const b=c.getBoundingClientRect(), x=(ev.clientX-b.left)/b.width-.5, y=(ev.clientY-b.top)/b.height-.5;
+      c.style.setProperty('--rx',(-y*16).toFixed(1)+'deg'); c.style.setProperty('--ry',(x*18).toFixed(1)+'deg'); }
+  }); });
+  desk.addEventListener('mouseleave',()=>{ desk.style.setProperty('--dx',0); desk.style.setProperty('--dy',0); reset(lastCard); lastCard=null; });
+}
+
 /* ================== БАЛИ, ЗВАННЯ, НАГОРОДИ ================== */
 // За рівень: 100 − 15 за підказку − 10 за хибну спробу (не менше 20), +20 до 30 с, +10 до 60 с; з готовою відповіддю 10.
 const RANKS=[[0,'rank.0'],[400,'rank.1'],[1200,'rank.2'],[2200,'rank.3'],[3100,'rank.4']];
@@ -120,6 +142,8 @@ function renderStats(pop){
   $('soundBtn').title=t(state.sound===false?'sound.on':'sound.off');
   $('rainBtn').innerHTML=RAIN.on?ICON_RAIN_ON:ICON_RAIN_OFF;
   $('rainBtn').title=t(RAIN.on?'rain.off':'rain.on');
+  const d3=document.body.classList.contains('d3');
+  $('d3Btn').classList.toggle('off',!d3); $('d3Btn').title=t(d3?'d3.off':'d3.on');
 }
 function toast(title,sub,icon){
   const el=document.createElement('div'); el.className='toast';
@@ -268,7 +292,7 @@ function renderCards(noDeal){
       ${ph}<div class="row"><span class="badge" style="background:${SRC_COL[c.src]}" title="${esc(t('card.badge',{s:SRC_TXT[ui()][c.src],i:INFO_TXT[ui()][c.info]}))}">${c.src}${c.info}</span>${c.pri==='високий'?`<span class="pri-h">● ${t('card.urgent')}</span>`:''}</div>
       <div class="ttl">${esc(c.title)}</div>${ui()==='en'&&c.titleEn?`<div class="gloss">${esc(c.titleEn)}</div>`:''}
       <div class="meta"><span>${valName('reg',c.reg)}</span><span>${c.date}</span><span>${valName('lang',c.lang)}</span>${c.sq?`<span>⌖${c.sq}</span>`:''}</div>`;
-    el.addEventListener('animationend',e=>{ if(e.animationName==='deal') el.classList.add('dealt'); });
+    el.addEventListener('animationend',e=>{ if(e.animationName==='deal'||e.animationName==='deal3') el.classList.add('dealt'); });
     el.addEventListener('mouseenter',()=>{
       link(c.id,true);
       // «живе» відео: на картці грає без звуку, поки наведено курсор
@@ -501,7 +525,7 @@ function openMenu(){
   $('reset').onclick=()=>{ if(confirm(t('menu.resetq'))) resetProgress(); };
   $('mExam').onclick=examDialog; $('mGroup').onclick=openGroup; $('mExams').onclick=openMyExams;
 }
-const resetProgress=()=>{state={...DEFAULT_STATE,cmd:state.cmd,ui:state.ui,sound:state.sound,rain:state.rain,exams:state.exams,group:state.group}; save(); closeMenu(); renderStats(); loadLevel(0);};
+const resetProgress=()=>{state={...DEFAULT_STATE,cmd:state.cmd,ui:state.ui,sound:state.sound,rain:state.rain,d3:state.d3,exams:state.exams,group:state.group}; save(); closeMenu(); renderStats(); loadLevel(0);};
 
 function finale(){
   const hints=Object.values(state.done).filter(v=>v==='hint').length;
@@ -653,6 +677,7 @@ $('credBtn').onclick=openCredits;
 $('examSkip').onclick=examSkip;
 $('examEnd').onclick=()=>{ if(confirm(t('exam.endq'))) finishExam(false); };
 $('soundBtn').onclick=()=>{ state.sound=state.sound===false; save(); renderStats(); SND.click(); };
+$('d3Btn').onclick=()=>{ state.d3=!document.body.classList.contains('d3'); save(); document.body.classList.toggle('d3',state.d3); renderStats(); SND.click(); };
 $('rainBtn').onclick=()=>{ state.rain=!RAIN.on; save(); state.rain?RAIN.start():RAIN.stop(); renderStats(); SND.click(); };
 $('overlay').addEventListener('click',e=>{if(e.target.id==='overlay') closeMenu();});
 $('viewer').addEventListener('click',e=>{if(e.target.id==='viewer') closeViewer();});
@@ -662,6 +687,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if($('viewer').cl
 applyStatic();
 renderDict();
 if(rainWanted()) RAIN.start();
+document.body.classList.toggle('d3',d3Wanted());
 renderStats();
 setInterval(tick,1000);
 loadLevel(state.level);

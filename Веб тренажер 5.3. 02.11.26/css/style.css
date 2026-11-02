@@ -550,3 +550,45 @@ aside{background:linear-gradient(180deg,rgba(0,229,255,.05),transparent 240px),r
 .m-mark.hover-link circle{fill:var(--accent)}
 
 @media print{ body::before,body::after{display:none} .report *{text-shadow:none!important} }
+
+/* =====================================================================
+   3D-РЕЖИМ (body.d3): голографічний стіл у перспективі, картки над ним
+   нахиляються за курсором, карта лежить площиною, вікна розгортаються в 3D.
+   Кути --dx/--dy (дошка) і --rx/--ry (картка) задає js/app.js за рухом миші.
+   ===================================================================== */
+main{overflow-x:clip}
+body.d3 .desk{transform-style:preserve-3d;transform-origin:50% 60%;
+  transform:perspective(1500px) rotateX(calc(8deg - var(--dy,0) * 6deg)) rotateY(calc(var(--dx,0) * 7deg));
+  transition:transform .3s ease-out}
+body.d3 .desk .rain-cv{transform:translateZ(-1px)}
+body.d3 .desk .desk-label{transform:translateZ(70px)} /* напис над картками, що висять над столом */
+body.d3 .desk .card{transform:translateZ(var(--z,14px)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+  transition:transform .18s ease-out,box-shadow .25s,opacity .3s,outline-color .2s}
+body.d3 .desk .card.target{--z:30px}
+body.d3 .desk .card:hover{--z:54px;box-shadow:0 34px 44px rgba(0,0,0,.65),var(--glow)}
+body.d3 .desk .card:not(.dealt){animation:deal3 .65s cubic-bezier(.2,.9,.3,1.1) var(--d,0s) backwards}
+@keyframes deal3{from{opacity:0;transform:translateZ(-260px) rotateX(38deg);filter:brightness(2.2)}60%{filter:brightness(1.3)}}
+body.d3 .desk .card.fly{transform:translateZ(340px) rotateX(-24deg) scale(.92);opacity:0;filter:blur(2px) brightness(1.8);
+  transition:transform .7s ease-in,opacity .7s,filter .7s}
+
+/* карта — площина на столі; при наведенні вирівнюється для читання */
+body.d3 #map svg{transform:perspective(1100px) rotateX(16deg);transform-origin:50% 60%;transition:transform .5s ease-out}
+body.d3 .mapwrap:hover #map svg{transform:perspective(1100px) rotateX(0deg)}
+
+/* вікна й сповіщення розгортаються в 3D */
+body.d3 .overlay.open .panel{animation:panel3 .38s cubic-bezier(.2,.9,.3,1.1)}
+@keyframes panel3{from{opacity:0;transform:perspective(1200px) rotateX(16deg) translateY(24px)}}
+body.d3 .viewer.open .vbox{animation:view3 .42s cubic-bezier(.2,.9,.3,1.1)}
+@keyframes view3{from{opacity:0;transform:perspective(1400px) rotateY(-20deg) scale(.9)}}
+body.d3 .toast{animation:toast3 .45s cubic-bezier(.2,.9,.3,1.2);transform-origin:50% 0}
+@keyframes toast3{from{opacity:0;transform:perspective(600px) rotateX(-80deg)}}
+body.d3 .btn:active,body.d3 .iconbtn:active{transform:translateY(1px) scale(.97)}
+
+/* сенсорні та вузькі екрани: лише легкий статичний нахил */
+@media (hover:none),(max-width:700px){
+  body.d3 .desk{transform:perspective(1500px) rotateX(4deg)}
+  body.d3 #map svg{transform:perspective(1100px) rotateX(10deg)}
+}
+.iconbtn.txt{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.04em;width:auto;padding:0 8px}
+.iconbtn.txt.off{color:var(--muted);text-decoration:line-through}
+@media print{ body.d3 .desk,body.d3 #map svg{transform:none!important} }
