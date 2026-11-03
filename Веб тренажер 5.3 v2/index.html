@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="uk" translate="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="google" content="notranslate">
+<title>Тренажер аналітика: відбір повідомлень за вимогою керівника</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-in">
+    <button class="brand" id="home" title="На початок">Тренажер аналітика<span>відбір повідомлень за вимогою керівника</span></button>
+    <nav class="steps" id="steps" aria-label="Рівні"></nav>
+  </div>
+</header>
+
+<!-- Екран 1. Мета й порядок роботи -->
+<section class="screen" id="screen-start">
+  <div class="wrap narrow">
+    <p class="kicker">Навчальна мета</p>
+    <h1>Навчитися швидко перетворювати усну вимогу керівника на точний запит до бази повідомлень і враховувати при цьому оцінку джерел.</h1>
+    <p class="lead">Аналітик щодня отримує завдання на кшталт «дайте все про мости зі Сходу, тільки перевірене». Помилка в запиті дає або зайві матеріали в доповіді, або пропущені важливі. Тренажер відпрацьовує саме цю навичку.</p>
+
+    <h2>Як працює тренажер</h2>
+    <ol class="how">
+      <li><b>Прочитайте вимогу керівника.</b> Вона вгорі кожного рівня.</li>
+      <li><b>Напишіть запит у полі під вимогою.</b> Поки ви друкуєте, таблиця показує, які повідомлення відбирає ваш запит.</li>
+      <li><b>Натисніть «Перевірити».</b> Тренажер покаже, чи збігається ваша вибірка з потрібною: що зайве, а що пропущено.</li>
+    </ol>
+    <p class="note">Клікати по таблиці не треба: все робиться тільки запитом.</p>
+
+    <h2>Чого ви навчитеся (8 рівнів, 20–30 хвилин)</h2>
+    <ol class="skills" id="skillList"></ol>
+
+    <button class="btn big" id="startBtn">Почати</button>
+    <p class="note">Усі повідомлення в базі вигадані: це навчальний сценарій.</p>
+  </div>
+</section>
+
+<!-- Екран 2. Рівень -->
+<section class="screen" id="screen-level" hidden>
+  <div class="wrap grid">
+    <div class="main">
+      <p class="kicker" id="lvlNum"></p>
+      <div class="order">
+        <div class="order-h">Вимога керівника</div>
+        <p id="task"></p>
+      </div>
+
+      <form class="query" id="qform" autocomplete="off">
+        <label for="q">Ваш запит</label>
+        <div class="qrow">
+          <input id="q" spellcheck="false" placeholder="наприклад: тип:звіт район:Північ">
+          <button class="btn" type="submit">Перевірити</button>
+        </div>
+        <div class="status" id="status"></div>
+      </form>
+
+      <div class="result" id="result" hidden></div>
+
+      <div class="table-h">
+        <h3>База повідомлень</h3>
+        <span id="counter"></span>
+      </div>
+      <div class="table-wrap">
+        <table class="db" id="db">
+          <thead><tr><th>№</th><th>тип</th><th>джерело</th><th>інфо</th><th>район</th><th>дата</th><th>заголовок</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <aside class="side">
+      <p class="kicker">Навичка</p>
+      <h2 id="lvlTitle"></h2>
+      <div id="theory"></div>
+      <div id="admTable"></div>
+      <div class="example">
+        <div class="example-h">Приклад (не відповідь)</div>
+        <code id="exQ"></code>
+        <span id="exD"></span>
+      </div>
+      <div class="hints">
+        <button class="btn ghost" id="hintBtn" type="button">Підказка</button>
+        <p id="hintText" hidden></p>
+      </div>
+      <details class="ref">
+        <summary>Довідка: синтаксис запитів</summary>
+        <table>
+          <tr><td><code>поле:значення</code></td><td>тип, район, джерело, інфо, дата</td></tr>
+          <tr><td><code>слово</code></td><td>частина слова в заголовку</td></tr>
+          <tr><td><code>"фраза"</code></td><td>точний фрагмент заголовка</td></tr>
+          <tr><td><code>A B</code></td><td>обидві умови</td></tr>
+          <tr><td><code>A АБО B</code></td><td>будь-яка з умов</td></tr>
+          <tr><td><code>-A</code>, <code>НЕ A</code></td><td>виключити</td></tr>
+          <tr><td><code>( … )</code></td><td>групування</td></tr>
+          <tr><td><code>&lt; &lt;= &gt; &gt;=</code></td><td>порівняння для джерела, інфо, дати</td></tr>
+        </table>
+      </details>
+    </aside>
+  </div>
+</section>
+
+<!-- Екран 3. Підсумок -->
+<section class="screen" id="screen-finish" hidden>
+  <div class="wrap narrow">
+    <p class="kicker">Підсумок</p>
+    <h1 id="finTitle"></h1>
+    <p class="lead" id="finLead"></p>
+    <h2>Відпрацьовані навички</h2>
+    <ol class="skills done" id="finSkills"></ol>
+    <h2>Пам'ятка аналітика</h2>
+    <ol class="memo">
+      <li>Розкладіть вимогу керівника на окремі умови й запишіть кожну через пробіл.</li>
+      <li>Шукайте за основою слова й пам'ятайте про чергування (міст / мост).</li>
+      <li>Об'єднуючи варіанти через АБО, беріть їх у дужки.</li>
+      <li>Для доповіді оцінюйте окремо джерело (літера) й інформацію (цифра).</li>
+      <li>F і 6 не викидайте: передавайте такі матеріали на перевірку.</li>
+    </ol>
+    <div class="row">
+      <button class="btn" id="againBtn">Пройти ще раз</button>
+    </div>
+  </div>
+</section>
+
+<script src="js/levels.js"></script>
+<script src="js/query.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
