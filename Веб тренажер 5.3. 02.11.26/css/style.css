@@ -398,7 +398,7 @@ body.fx::before{content:"";position:fixed;left:0;right:0;top:-140px;height:140px
 /* шапка */
 .brand{font-weight:700;letter-spacing:.18em;color:#e8fbff;text-shadow:0 0 10px rgba(0,229,255,.55)}
 .brand small{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);text-shadow:none;margin-top:2px}
-.sys{display:none;display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--ok);white-space:nowrap}
+.sys{display:none;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--ok);white-space:nowrap}
 .sys i{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);animation:blink 1.6s steps(2) infinite}
 .sys b{color:var(--muted);font-weight:400}
 .progress{height:6px;border-radius:0;background:rgba(0,229,255,.08);border:1px solid var(--line)}
