@@ -1,6 +1,6 @@
 /* ================== СТАН ================== */
 const STORE='kartoteka-progress-v3'; // v3: 32 рівні, залік, таблиця групи, мова інтерфейсу
-const DEFAULT_STATE={level:0,done:{},score:{},badges:{},streak:0,cmd:'ua',ui:'ua',sound:true,exams:[],group:[]};
+const DEFAULT_STATE={level:0,extra:false,done:{},score:{},badges:{},streak:0,cmd:'ua',ui:'ua',sound:true,exams:[],group:[]};
 let state={...DEFAULT_STATE};
 try{const s=JSON.parse(localStorage.getItem(STORE)); if(s&&typeof s.level==='number') state=Object.assign(state,s);}catch(e){}
 const save=()=>{try{localStorage.setItem(STORE,JSON.stringify(state))}catch(e){}};
@@ -98,14 +98,13 @@ const RAIN=(()=>{
     flash(){ goldUntil=Date.now()+1300; } // золотий дощ після правильної відповіді
   };
 })();
-// За замовчуванням увімкнено, якщо в системі не обрано «зменшити анімацію».
-const rainWanted=()=>state.rain!=null?state.rain:!matchMedia('(prefers-reduced-motion: reduce)').matches;
+const rainWanted=()=>state.rain===true; // ефекти за замовчуванням вимкнені: вони відволікають від завдання
 const ICON_RAIN_ON='<svg viewBox="0 0 24 24"><path d="M6 3v6M6 13v2M12 6v8M12 18v2M18 3v4M18 11v6"/></svg>';
 const ICON_RAIN_OFF='<svg viewBox="0 0 24 24"><path d="M6 3v6M6 13v2M12 6v8M12 18v2M18 3v4M18 11v6" opacity=".4"/><path d="M4 4l16 16"/></svg>';
 
 /* ================== 3D: НАХИЛ ДОШКИ Й КАРТОК ЗА КУРСОРОМ ================== */
 // Стилі — у css/style.css (body.d3). Тут лише кути: --dx/--dy для дошки, --rx/--ry для картки під курсором.
-const d3Wanted=()=>state.d3!=null?state.d3:!matchMedia('(prefers-reduced-motion: reduce)').matches;
+const d3Wanted=()=>state.d3===true;
 {
   const desk=$('desk'); let raf=0, ev=null, lastCard=null;
   const reset=c=>{ if(c){ c.style.removeProperty('--rx'); c.style.removeProperty('--ry'); } };
@@ -133,6 +132,13 @@ const BADGES=[
 const ENG_RE=/(^|[\s(!-])(type|region|source|info|rating|date|lang|language|priority|equip|equipment|image|shot|meta|square|similar):|(^|\s)(OR|AND|NOT)(\s|$)/i;
 const total=()=>Object.values(state.score).reduce((a,b)=>a+b,0);
 const rankOf=p=>t(RANKS.filter(r=>p>=r[0]).pop()[1]);
+// Основні рівні (навичка: писати пошукові запити) ідуть першими, додаткові — після них.
+const CORE=[0,2,3,5,7,8,12,13];
+const ORDER=[...CORE,...LEVELS.map((L,i)=>i).filter(i=>!CORE.includes(i))]; // спершу основні, потім додаткові
+const vis=()=>ORDER;
+const visPos=n=>Math.max(0,vis().indexOf(n));
+const visDone=()=>vis().filter(i=>state.done[i]).length;
+const fxSync=()=>document.body.classList.toggle('fx',RAIN.on||document.body.classList.contains('d3'));
 const blockDone=key=>LEVELS.every((L,i)=>L.block!==key||state.done[i]===true);
 
 function renderStats(pop){
@@ -215,9 +221,9 @@ const guideHtml=list=>`<div class="guide">${list.map(e=>{const I=EQ_INFO[e];
 
 function renderText(){
   const n=curLevel, L=LEVELS[n], en=cmd()==='en';
-  $('menuBtn').textContent=t('nav.level',{n:n+1,total:LEVELS.length});
+  $('menuBtn').textContent=t('nav.level',{n:visPos(n)+1,total:vis().length});
   $('task').textContent=loc(L,'task');
-  $('lnum').textContent=t('nav.levelShort',{n:n+1})+(!exam&&state.done[n]?' · '+t('lvl.done'):'')+(!exam&&state.score[n]?` · ★ ${state.score[n]}`:'');
+  $('lnum').textContent=t('nav.levelShort',{n:visPos(n)+1})+(!exam&&state.done[n]?' · '+t('lvl.done'):'')+(!exam&&state.score[n]?` · ★ ${state.score[n]}`:'');
   $('ltitle').textContent=loc(L,'title');
   $('lpart').textContent=loc(L.blockPart,'part');
   $('lsyntax').innerHTML=highlight(en&&L.syntaxEn?L.syntaxEn:ui()==='en'&&L.syntaxEn?L.syntaxEn:T(L.syntax));
@@ -229,7 +235,7 @@ function renderText(){
   $('lbody').querySelectorAll('code').forEach(el=>{const x=el.textContent,v=codeLang(x); if(v!==x&&!body.includes(`<code>${esc(v)}</code>`)) el.textContent=v;});
   $('lbody').querySelectorAll('figure[data-eq]').forEach(f=>f.onclick=()=>openRef(f.dataset.eq));
   $('lex').innerHTML=L.ex.map(([c,d,dEn])=>`<div><code>${highlight(T(c))}</code> — ${esc(ui()==='en'?dEn:d)}</div>`).join('');
-  $('prog').style.width=(Object.keys(state.done).length/LEVELS.length*100)+'%';
+  $('prog').style.width=(visDone()/vis().length*100)+'%';
   document.querySelectorAll('#cmdSeg button').forEach(b=>b.classList.toggle('on',b.dataset.cmd===cmd()));
   $('promptLbl').textContent=t('editor.prompt');
   $('q').placeholder=t('editor.ph',{ex:T('тип:фото')});
@@ -491,14 +497,14 @@ function success(){
     if(blockDone('eye')) award('eye');
     if(blockDone('osint')) award('osint');
     if(blockDone('map')) award('map');
-    if(n===LEVELS.length-1) award('final');
+    if(n===vis()[vis().length-1]) award('final');
     save();
   }
   const hits=[...document.querySelectorAll('.desk .card')].filter(e=>target.has(+e.dataset.id));
   hits.forEach((e,i)=>setTimeout(()=>{e.classList.remove('target'); e.insertAdjacentHTML('beforeend',`<span class="stamp">${t('stamp')}</span>`);},i*70));
   setTimeout(()=>{ SND.whoosh(); hits.forEach(e=>e.classList.add('fly')); },450+hits.length*70);
-  $('prog').style.width=(Object.keys(state.done).length/LEVELS.length*100)+'%';
-  setTimeout(()=>{ if(exam) examNext(); else n+1<LEVELS.length ? loadLevel(n+1) : finale(); },1300+hits.length*70);
+  $('prog').style.width=(visDone()/vis().length*100)+'%';
+  setTimeout(()=>{ if(exam) examNext(); else visPos(n)+1<vis().length ? loadLevel(vis()[visPos(n)+1]) : finale(); },1300+hits.length*70);
 }
 function shakeEditor(){const ed=$('editor'); ed.classList.remove('shake'); void ed.offsetWidth; ed.classList.add('shake');}
 
@@ -511,11 +517,14 @@ const badgeGrid=()=>`<div class="badges">${BADGES.map(b=>{const on=state.badges[
 
 function openMenu(){
   if(exam) return;
-  let html=`<h2>${t('menu.levels')}</h2><p>${t('menu.sum',{d:Object.keys(state.done).length,n:LEVELS.length,s:total(),r:rankOf(total())})}</p><div class="lv-grid">`;
-  LEVELS.forEach((L,i)=>{
-    if(L.part) html+=`<div class="part">${esc(loc(L,'part'))}</div>`;
+  let html=`<h2>${t('menu.levels')}</h2><p>${t('menu.sum',{d:visDone(),n:vis().length,s:total(),r:rankOf(total())})}</p><div class="lv-grid">`;
+  let lastBlock=null;
+  vis().forEach((i,pos)=>{ const L=LEVELS[i];
+    if(pos===0) html+=`<div class="part">${t('menu.core')}</div>`;
+    if(pos===CORE.length){ html+=`<div class="part">${t('menu.extra')}</div>`; lastBlock=null; }
+    if(pos>=CORE.length&&L.block!==lastBlock){ lastBlock=L.block; html+=`<div class="part sub">${esc(loc(L.blockPart,'part'))}</div>`; }
     const d=state.done[i];
-    html+=`<button class="lv-item${i===state.level?' cur':''}" data-l="${i}"><b>${i+1}</b>${esc(loc(L,'title'))}${state.score[i]?`<span class="pts">${state.score[i]}</span>`:''}${d?`<span class="ck${d==='hint'?' hint':''}">✓</span>`:''}</button>`;
+    html+=`<button class="lv-item${i===state.level?' cur':''}" data-l="${i}"><b>${pos+1}</b>${esc(loc(L,'title'))}${state.score[i]?`<span class="pts">${state.score[i]}</span>`:''}${d?`<span class="ck${d==='hint'?' hint':''}">✓</span>`:''}</button>`;
   });
   html+=`</div><h2 class="mt">${t('menu.badges')}</h2>${badgeGrid()}
     <div class="row wrap"><button class="btn ghost" id="reset">${t('menu.reset')}</button><span class="spacer"></span>
@@ -525,17 +534,17 @@ function openMenu(){
   $('reset').onclick=()=>{ if(confirm(t('menu.resetq'))) resetProgress(); };
   $('mExam').onclick=examDialog; $('mGroup').onclick=openGroup; $('mExams').onclick=openMyExams;
 }
-const resetProgress=()=>{state={...DEFAULT_STATE,cmd:state.cmd,ui:state.ui,sound:state.sound,rain:state.rain,d3:state.d3,exams:state.exams,group:state.group}; save(); closeMenu(); renderStats(); loadLevel(0);};
+const resetProgress=()=>{state={...DEFAULT_STATE,cmd:state.cmd,ui:state.ui,extra:state.extra,sound:state.sound,rain:state.rain,d3:state.d3,exams:state.exams,group:state.group}; save(); closeMenu(); renderStats(); loadLevel(0);};
 
 function finale(){
   const hints=Object.values(state.done).filter(v=>v==='hint').length;
-  openPanel(`<div class="finale"><div class="lesson-n">${t('fin.kicker')}</div><div class="big">${t('fin.title')}</div><div class="score">${t('fin.score',{s:total(),r:rankOf(total())})}</div><p>${t('fin.done',{d:Object.keys(state.done).length,n:LEVELS.length})}${hints?t('fin.hints',{h:hints}):t('fin.nohints')}</p><p>${t('fin.text')}</p></div>${badgeGrid()}<div class="row wrap"><button class="btn ghost" id="again">${t('fin.again')}</button><span class="spacer"></span><button class="btn ghost" id="fExam">${t('exam.start')}</button><button class="btn" id="toMenu">${t('fin.menu')}</button></div>`);
+  openPanel(`<div class="finale"><div class="lesson-n">${t('fin.kicker')}</div><div class="big">${t('fin.title')}</div><div class="score">${t('fin.score',{s:total(),r:rankOf(total())})}</div><p>${t('fin.done',{d:visDone(),n:vis().length})}${hints?t('fin.hints',{h:hints}):t('fin.nohints')}</p><p>${t('fin.text')}</p></div>${badgeGrid()}<div class="row wrap"><button class="btn ghost" id="again">${t('fin.again')}</button><span class="spacer"></span><button class="btn ghost" id="fExam">${t('exam.start')}</button><button class="btn" id="toMenu">${t('fin.menu')}</button></div>`);
   $('again').onclick=resetProgress; $('toMenu').onclick=openMenu; $('fExam').onclick=examDialog;
 }
 
 /* ================== ЗАЛІК ================== */
 function examDialog(){
-  openPanel(`<h2>${t('exam.title')}</h2><p>${t('exam.rules',{n:EXAM_TASKS,m:EXAM_LIMIT/60})}</p>
+  openPanel(`<h2>${t('exam.title')}</h2><p>${t('exam.rules',{n:Math.min(EXAM_TASKS,vis().length),m:EXAM_LIMIT/60})}</p>
     <label class="fld">${t('exam.name')}<input id="exName" maxlength="60" autocomplete="name"></label>
     <label class="fld">${t('exam.group')}<input id="exGroup" maxlength="30"></label>
     <div class="row"><button class="btn ghost" data-close>${t('btn.cancel')}</button><button class="btn" id="exGo">${t('exam.go')}</button></div>`);
@@ -550,10 +559,10 @@ function examDialog(){
 }
 function pickExamLevels(){
   // по одному випадковому рівню з кожного блоку, решту добираємо випадково
-  const blocks=[...new Set(LEVELS.map(L=>L.block))];
+  const V=vis(), blocks=[...new Set(V.map(i=>LEVELS[i].block))];
   const rnd=a=>a[Math.floor(Math.random()*a.length)];
-  const pick=blocks.map(b=>rnd(LEVELS.map((L,i)=>L.block===b?i:-1).filter(i=>i>=0)));
-  const rest=LEVELS.map((L,i)=>i).filter(i=>!pick.includes(i));
+  const pick=blocks.map(b=>rnd(V.filter(i=>LEVELS[i].block===b)));
+  const rest=V.filter(i=>!pick.includes(i));
   while(pick.length<EXAM_TASKS&&rest.length) pick.push(rest.splice(Math.floor(Math.random()*rest.length),1)[0]);
   return pick.slice(0,EXAM_TASKS).sort((a,b)=>a-b);
 }
@@ -588,7 +597,7 @@ function finishExam(timeout){
   rep.code=encodeResult(rep);
   state.exams=[rep,...(state.exams||[])].slice(0,20); save();
   exam=null; document.body.classList.remove('exam');
-  loadLevel(state.level);
+  loadLevel(vis().includes(state.level)?state.level:vis()[0]);
   showReport(rep);
 }
 function showReport(rep){
@@ -669,16 +678,16 @@ $('tip').onclick=()=>{ if(exam) return; hintN=Math.min(hintN+1,LEVELS[curLevel].
 document.querySelectorAll('#cmdSeg button').forEach(b=>b.onclick=()=>setUi(b.dataset.cmd));
 document.querySelectorAll('#uiSeg button').forEach(b=>b.onclick=()=>setUi(b.dataset.ui));
 $('hint').onclick=()=>{ if(exam) return; $('q').value=T(LEVELS[curLevel].sol); usedAnswer=true; preview(); setFb(t('fb.answer'),''); $('q').focus(); };
-$('prev').onclick=()=>loadLevel(state.level-1);
-$('next').onclick=()=>loadLevel(state.level+1);
+$('prev').onclick=()=>loadLevel(vis()[Math.max(0,visPos(state.level)-1)]);
+$('next').onclick=()=>loadLevel(vis()[Math.min(vis().length-1,visPos(state.level)+1)]);
 $('menuBtn').onclick=openMenu;
 $('examBtn').onclick=examDialog;
 $('credBtn').onclick=openCredits;
 $('examSkip').onclick=examSkip;
 $('examEnd').onclick=()=>{ if(confirm(t('exam.endq'))) finishExam(false); };
 $('soundBtn').onclick=()=>{ state.sound=state.sound===false; save(); renderStats(); SND.click(); };
-$('d3Btn').onclick=()=>{ state.d3=!document.body.classList.contains('d3'); save(); document.body.classList.toggle('d3',state.d3); renderStats(); SND.click(); };
-$('rainBtn').onclick=()=>{ state.rain=!RAIN.on; save(); state.rain?RAIN.start():RAIN.stop(); renderStats(); SND.click(); };
+$('d3Btn').onclick=()=>{ state.d3=!document.body.classList.contains('d3'); save(); document.body.classList.toggle('d3',state.d3); fxSync(); renderStats(); SND.click(); };
+$('rainBtn').onclick=()=>{ state.rain=!RAIN.on; save(); state.rain?RAIN.start():RAIN.stop(); fxSync(); renderStats(); SND.click(); };
 $('overlay').addEventListener('click',e=>{if(e.target.id==='overlay') closeMenu();});
 $('viewer').addEventListener('click',e=>{if(e.target.id==='viewer') closeViewer();});
 $('vclose').onclick=closeViewer;
@@ -688,6 +697,7 @@ applyStatic();
 renderDict();
 if(rainWanted()) RAIN.start();
 document.body.classList.toggle('d3',d3Wanted());
+fxSync();
 renderStats();
 setInterval(tick,1000);
-loadLevel(state.level);
+loadLevel(vis().includes(state.level)?state.level:vis()[0]);

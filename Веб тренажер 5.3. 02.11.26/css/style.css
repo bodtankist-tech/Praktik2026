@@ -386,17 +386,19 @@ html,body{background:
   linear-gradient(90deg,rgba(0,229,255,.035) 1px,transparent 1px) 0 0/40px 40px,
   var(--bg)}
 /* скан-лінії монітора і повільна смуга сканування */
-body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:60;
+body.fx::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:60;
   background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px)}
-body::before{content:"";position:fixed;left:0;right:0;top:-140px;height:140px;pointer-events:none;z-index:59;
+body.fx::before{content:"";position:fixed;left:0;right:0;top:-140px;height:140px;pointer-events:none;z-index:59;
   background:linear-gradient(transparent,rgba(0,229,255,.06),transparent);animation:sweep 9s linear infinite}
 @keyframes sweep{to{transform:translateY(calc(100vh + 140px))}}
-@media (prefers-reduced-motion:reduce){body::before{display:none}}
+@media (prefers-reduced-motion:reduce){body.fx::before{display:none}}
+.goal{margin:0 0 4px;font-size:13.5px;color:var(--muted)}
+.goal b{color:var(--accent)}
 
 /* шапка */
 .brand{font-weight:700;letter-spacing:.18em;color:#e8fbff;text-shadow:0 0 10px rgba(0,229,255,.55)}
 .brand small{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);text-shadow:none;margin-top:2px}
-.sys{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--ok);white-space:nowrap}
+.sys{display:none;display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--ok);white-space:nowrap}
 .sys i{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);animation:blink 1.6s steps(2) infinite}
 .sys b{color:var(--muted);font-weight:400}
 .progress{height:6px;border-radius:0;background:rgba(0,229,255,.08);border:1px solid var(--line)}
@@ -595,3 +597,5 @@ body.d3 .btn:active,body.d3 .iconbtn:active{transform:translateY(1px) scale(.97)
 @media print{ body.d3 .desk,body.d3 #map svg{transform:none!important} }
 
 .card .gloss.orig{font-style:normal;font-family:var(--mono);font-size:10.5px;letter-spacing:.02em}
+body.fx .sys{display:flex}
+.part.sub{color:var(--muted);margin-top:2px;letter-spacing:.05em}
