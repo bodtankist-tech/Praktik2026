@@ -1,7 +1,29 @@
 # Даш борд аналітика 09.11. «ОКО»: дашборд аналітика з картою обстановки
 
 ```
-PostgreSQL  →  Python (FastAPI)  →  Web-дашборд (HTML/CSS/JS: Chart.js + Leaflet/OpenStreetMap + milsymbol)
+            БЕКЕНД (backend/, порт 8020)                    ФРОНТЕНД (frontend/, порт 8080)
+PostgreSQL  →  FastAPI: JSON API /api/*   ── HTTP + CORS ──→  HTML/CSS/JS: Chart.js + Leaflet/OSM + milsymbol
+```
+
+Проєкт розділено на дві незалежні частини, кожна зі своїм сервером:
+
+| | Бекенд | Фронтенд |
+|---|---|---|
+| Папка | [backend/](backend/) | [frontend/](frontend/) |
+| Що містить | API (FastAPI), робота з БД, схема й генератор даних | сторінка дашборда: розмітка, стилі, графіки, карта |
+| Сервер | `uvicorn api.main:app --port 8020` | будь-який статичний, напр. `python -m http.server 8080` |
+| Адреса | http://localhost:8020/api, Swagger: http://localhost:8020/docs | http://localhost:8080 |
+| Зв'язок | віддає лише JSON, дозволяє CORS | бере адресу API з [frontend/config.js](frontend/config.js) |
+
+```
+backend/
+  api/main.py, api/db.py     ендпоїнти та доступ до PostgreSQL
+  db/schema.sql, seed.py     схема, генератор, oko_dashboard.sql для здачі
+  requirements.txt, .env     залежності й рядок підключення (DATABASE_URL)
+frontend/
+  index.html, styles.css, app.js
+  config.js                  API_BASE — адреса бекенду
+run.py, ЗАПУСК.bat           запуск обох серверів однією командою
 ```
 
 Завдання (з дошки): **Postgres** — створити БД, заповнити синтетичними даними, надати `.sql`;
@@ -14,11 +36,11 @@ PostgreSQL  →  Python (FastAPI)  →  Web-дашборд (HTML/CSS/JS: Chart.j
 
 | Частина | Реалізація |
 |---|---|
-| БД | 6 таблиць + представлення `v_events` ([db/schema.sql](db/schema.sql)): довідники `regions`, `directions`, `event_types`; `units` (підрозділи з кодом умовного знака APP-6D), `events` (події обстановки), `frontline_points` (умовна лінія) |
-| Дані | [db/seed.py](db/seed.py): 109 підрозділів (свої й противника), 1537 подій за 60 діб, 19 точок умовної лінії. Генерація відтворювана (`--seed 42`) |
-| `.sql` для здачі | **[db/oko_dashboard.sql](db/oko_dashboard.sql)**: схема й усі дані одним файлом; [db/data.sql](db/data.sql) містить лише INSERT-и |
-| API | [api/main.py](api/main.py): FastAPI, сирий SQL (psycopg2), лише параметризовані запити, білий список для сортування |
-| Дашборд | [web/](web/): фільтри, 6 KPI, карта, 7 графіків, журнал подій із сортуванням і пагінацією |
+| БД | 6 таблиць + представлення `v_events` ([backend/db/schema.sql](backend/db/schema.sql)): довідники `regions`, `directions`, `event_types`; `units` (підрозділи з кодом умовного знака APP-6D), `events` (події обстановки), `frontline_points` (умовна лінія) |
+| Дані | [backend/db/seed.py](backend/db/seed.py): 109 підрозділів (свої й противника), 1537 подій за 60 діб, 19 точок умовної лінії. Генерація відтворювана (`--seed 42`) |
+| `.sql` для здачі | **[backend/db/oko_dashboard.sql](backend/db/oko_dashboard.sql)**: схема й усі дані одним файлом; [backend/db/data.sql](backend/db/data.sql) містить лише INSERT-и |
+| Бекенд (API) | [backend/api/main.py](backend/api/main.py): FastAPI, сирий SQL (psycopg2), лише параметризовані запити, білий список для сортування |
+| Фронтенд (дашборд) | [frontend/](frontend/): фільтри, 6 KPI, карта, 7 графіків, журнал подій із сортуванням і пагінацією |
 
 ### Умовні знаки
 Позначки підрозділів будує бібліотека **milsymbol** за 20-значним кодом **APP-6D (SIDC)** з поля `units.sidc`.
@@ -56,32 +78,55 @@ PostgreSQL  →  Python (FastAPI)  →  Web-дашборд (HTML/CSS/JS: Chart.j
 
 ### Windows: подвійний клік по `ЗАПУСК.bat`
 - **Перший раз** файл запускає налаштування ([scripts/setup_windows.ps1](scripts/setup_windows.ps1)). Воно запитає пароль
-  користувача `postgres` (введення приховане) і створить `.env`, базу `oko_dashboard`, `.venv` та дані.
-- **Далі** файл одразу запускає сервер ([run.py](run.py)), і через кілька секунд браузер сам відкриває **http://localhost:8020**.
-  Якщо сервер уже працює, лише відкриється вкладка.
-- **Зупинка:** закрийте чорне вікно.
+  користувача `postgres` (введення приховане) і створить `backend\.env`, базу `oko_dashboard`, `.venv` та дані.
+- **Далі** файл запускає [run.py](run.py): він стартує **бекенд** (порт 8020) і **фронтенд** (порт 8080) як два окремі процеси,
+  і браузер сам відкриває **http://localhost:8080**. Якщо сервери вже працюють, лише відкриється вкладка.
+- **Зупинка:** закрийте чорне вікно (зупиняються обидва сервери).
 
 Перегенерувати дані: `powershell -ExecutionPolicy Bypass -File .\scripts\setup_windows.ps1 -Reseed`.
 
-### Вручну
+### З терміналів (два окремі вікна)
+Після першого налаштування (`ЗАПУСК.bat` або `scripts\setup_windows.ps1`) кожну частину можна запускати у своєму терміналі
+(у VS Code: **Terminal → New Terminal**, друге вікно кнопкою «+» або «Split»). Команди виконувати з папки проєкту:
+
+```powershell
+# термінал 1 — бекенд (API, порт 8020); тут видно журнал запитів
+.\.venv\Scripts\python run.py backend
+
+# термінал 2 — фронтенд (дашборд, порт 8080); браузер відкриється сам
+.\.venv\Scripts\python run.py frontend
+```
+Зупинка: `Ctrl+C` у кожному терміналі. Обидва сервери в одному терміналі: `.\.venv\Scripts\python run.py`
+(те саме робить `ЗАПУСК.bat`).
+
+Без `run.py`, напряму стандартними командами:
+```powershell
+.\.venv\Scripts\Activate.ps1
+cd backend;  uvicorn api.main:app --port 8020     # термінал 1
+cd frontend; python -m http.server 8080           # термінал 2
+```
+
+### Перше налаштування вручну (без `setup_windows.ps1`)
 ```powershell
 python -m venv .venv; .\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-Copy-Item .env.example .env          # вписати USER і PASSWORD
+pip install -r backend\requirements.txt
+Copy-Item backend\.env.example backend\.env      # вписати USER і PASSWORD
 psql -U postgres -c "CREATE DATABASE oko_dashboard;"
-python db\seed.py                    # схема + дані (або: psql -U postgres -d oko_dashboard -f db\oko_dashboard.sql)
-uvicorn api.main:app --port 8020
+python backend\db\seed.py                        # схема + дані (або: psql ... -f backend\db\oko_dashboard.sql)
 ```
-Відкрити http://localhost:8020 (дашборд) і http://localhost:8020/docs (Swagger API).
-Перевірка: `python scripts\smoke_test.py`.
+Відкрити http://localhost:8080 (дашборд) і http://localhost:8020/docs (Swagger API).
+Перевірка бекенду: `python scripts\smoke_test.py`.
 
-> **Не відкривайте `web/index.html` подвійним кліком.** Сервери OpenStreetMap блокують тайли для сторінок `file://`
-> («Access blocked»), а API без запущеного сервера недоступне. Якщо сервер працює, сторінка сама перейде на http://localhost:8020.
+Якщо бекенд працює на іншій адресі чи порту, змініть `API_BASE` у [frontend/config.js](frontend/config.js);
+фронтенд можна роздавати будь-яким статичним сервером (nginx, Live Server у VS Code тощо).
+
+> **Не відкривайте `frontend/index.html` подвійним кліком.** Сервери OpenStreetMap блокують тайли для сторінок `file://`
+> («Access blocked»). Якщо фронтенд-сервер працює, сторінка сама перейде на http://localhost:8080.
 >
-> Для карти й бібліотек (CDN) потрібен інтернет. FastAPI сам віддає сторінку, тому окремий веб-сервер не потрібен.
-> Якщо `psql -f` не бачить файл через кирилицю в шляху, передайте його через перенаправлення: `psql ... < db\oko_dashboard.sql`.
+> Для карти й бібліотек (CDN) потрібен інтернет.
+> Якщо `psql -f` не бачить файл через кирилицю в шляху, передайте його через перенаправлення: `psql ... < backend\db\oko_dashboard.sql`.
 
-## API
+## API (бекенд, http://localhost:8020)
 
 Фільтри подій (необов'язкові): `from`, `to` (YYYY-MM-DD, включно), `region`, `direction`, `event_type`, `min_intensity` (1–10).
 

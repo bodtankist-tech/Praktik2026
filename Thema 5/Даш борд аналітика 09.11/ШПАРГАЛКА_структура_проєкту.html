@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Шпаргалка: структура дашборда «ОКО»</title>
+<style>
+  :root {
+    --be: #1d5fbf;   --be-bg: #e8f0fc;   /* бекенд — синій */
+    --fe: #c45a00;   --fe-bg: #fdf0e3;   /* фронтенд — помаранчевий */
+    --rt: #7b3fb5;   --rt-bg: #f3ebfb;   /* корінь — фіолетовий */
+    --ot: #4f5b66;   --ot-bg: #eef1f4;   /* інше — сірий */
+    --qa: #0f7a5a;   --qa-bg: #e6f5ef;   /* питання — зелений */
+    --db: #a3162e;   --db-bg: #fbe9ec;   /* база даних — червоний */
+    --text: #1d232a; --muted: #5d6873;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #fafbfc; color: var(--text);
+         font: 16px/1.5 "Segoe UI", system-ui, sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 24px 16px 60px; }
+  h1 { margin: 0 0 4px; font-size: 26px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  h2 { margin: 36px 0 12px; padding: 8px 14px; border-radius: 8px; font-size: 20px; color: #fff; }
+  code, .tree { font-family: Consolas, "Cascadia Mono", monospace; }
+  code { background: rgba(0,0,0,.06); padding: 1px 5px; border-radius: 4px; font-size: 14px; }
+
+  /* легенда й навігація */
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; position: sticky; top: 0;
+            background: #fafbfc; padding: 8px 0; z-index: 2; border-bottom: 1px solid #e3e7eb; }
+  .legend a { text-decoration: none; padding: 5px 12px; border-radius: 20px; font-weight: 600;
+              font-size: 14px; border: 2px solid; }
+
+  /* схема */
+  .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 12px 0; }
+  .box { padding: 10px 14px; border-radius: 8px; border: 2px solid; font-weight: 600; text-align: center; }
+  .box small { display: block; font-weight: 400; font-size: 13px; }
+  .arrow { font-size: 22px; color: var(--muted); }
+  .say { background: #fff; border-left: 5px solid var(--text); padding: 10px 14px; border-radius: 6px; margin: 12px 0; }
+
+  /* дерево */
+  .tree { background: #fff; border: 1px solid #e3e7eb; border-radius: 8px; padding: 14px 18px;
+          font-size: 15px; line-height: 1.7; white-space: pre; overflow-x: auto; }
+  .tree .c { color: var(--muted); }
+
+  /* картки файлів */
+  .card { background: #fff; border: 1px solid #e3e7eb; border-left: 6px solid; border-radius: 8px;
+          padding: 10px 14px; margin: 10px 0; }
+  .card .name { font-family: Consolas, monospace; font-weight: 700; font-size: 16px; }
+  .card p { margin: 4px 0 0; }
+  .card ul { margin: 6px 0 0; padding-left: 20px; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 10px;
+         margin-left: 6px; vertical-align: middle; color: #fff; background: #a3162e; font-family: "Segoe UI", sans-serif; }
+  .tag.ok { background: var(--qa); }
+
+  .be { color: var(--be); border-color: var(--be); } .be-bg { background: var(--be-bg); }
+  .fe { color: var(--fe); border-color: var(--fe); } .fe-bg { background: var(--fe-bg); }
+  .rt { color: var(--rt); border-color: var(--rt); } .rt-bg { background: var(--rt-bg); }
+  .ot { color: var(--ot); border-color: var(--ot); } .ot-bg { background: var(--ot-bg); }
+  .qa { color: var(--qa); border-color: var(--qa); } .qa-bg { background: var(--qa-bg); }
+  .db { color: var(--db); border-color: var(--db); } .db-bg { background: var(--db-bg); }
+  h2.be { background: var(--be); } h2.fe { background: var(--fe); } h2.rt { background: var(--rt); }
+  h2.ot { background: var(--ot); } h2.qa { background: var(--qa); } h2.db { background: var(--db); }
+  .card.be, .card.fe, .card.rt, .card.ot, .card.db { color: var(--text); }
+  .card.be .name { color: var(--be); } .card.fe .name { color: var(--fe); }
+  .card.rt .name { color: var(--rt); } .card.ot .name { color: var(--ot); } .card.db .name { color: var(--db); }
+
+  .qa-item { background: #fff; border: 1px solid #e3e7eb; border-left: 6px solid var(--qa);
+             border-radius: 8px; padding: 10px 14px; margin: 10px 0; }
+  .qa-item b { color: var(--qa); }
+  .qa-item p { margin: 4px 0 0; }
+
+  @media print {
+    .legend { position: static; }
+    h2 { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .card, .qa-item { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Шпаргалка: для чого кожна папка і файл</h1>
+  <p class="sub">Дашборд «ОКО» · PostgreSQL + FastAPI + HTML/CSS/JS · кожен колір позначає окрему частину проєкту</p>
+
+  <nav class="legend">
+    <a href="#scheme" class="ot ot-bg">Схема</a>
+    <a href="#backend" class="be be-bg">■ Бекенд</a>
+    <a href="#database" class="db db-bg">■ База даних</a>
+    <a href="#frontend" class="fe fe-bg">■ Фронтенд</a>
+    <a href="#root" class="rt rt-bg">■ Корінь проєкту</a>
+    <a href="#other" class="ot ot-bg">■ Інші папки</a>
+    <a href="#questions" class="qa qa-bg">■ Питання викладача</a>
+  </nav>
+
+  <!-- ===================== СХЕМА ===================== -->
+  <h2 id="scheme" class="ot">Загальна схема (сказати першим)</h2>
+  <div class="flow">
+    <div class="box db db-bg">PostgreSQL<small>база даних</small></div>
+    <span class="arrow">→</span>
+    <div class="box be be-bg">Бекенд (FastAPI)<small>порт 8020 · віддає JSON</small></div>
+    <span class="arrow">→ HTTP + CORS →</span>
+    <div class="box fe fe-bg">Фронтенд (HTML/CSS/JS)<small>порт 8080 · браузер</small></div>
+  </div>
+  <div class="say">«Проєкт розділено на бекенд і фронтенд. Бекенд бере дані з бази PostgreSQL і віддає їх через API
+    у форматі JSON. Фронтенд — це сторінка в браузері, яка звертається до API і малює графіки й карту.
+    Вони працюють як два окремі сервери на різних портах.»</div>
+
+  <div class="tree">Даш борд аналітика 09.11/
+<span class="be">├── backend/                 </span><span class="c">← серверна частина</span>
+<span class="be">│   ├── api/main.py          </span><span class="c">← ендпоїнти API</span>
+<span class="be">│   ├── api/db.py            </span><span class="c">← підключення до PostgreSQL</span>
+<span class="be">│   ├── api/__init__.py      </span><span class="c">← позначка «пакет Python»</span>
+<span class="db">│   ├── db/schema.sql        </span><span class="c">← структура бази</span>
+<span class="db">│   ├── db/seed.py           </span><span class="c">← генератор даних</span>
+<span class="db">│   ├── db/data.sql          </span><span class="c">← лише дані</span>
+<span class="db">│   ├── db/oko_dashboard.sql </span><span class="c">← файл для здачі</span>
+<span class="be">│   ├── requirements.txt     </span><span class="c">← бібліотеки Python</span>
+<span class="be">│   ├── .env                 </span><span class="c">← пароль (секрет)</span>
+<span class="be">│   └── .env.example         </span><span class="c">← шаблон без пароля</span>
+<span class="fe">├── frontend/                </span><span class="c">← сторінка в браузері</span>
+<span class="fe">│   ├── index.html           </span><span class="c">← розмітка</span>
+<span class="fe">│   ├── styles.css           </span><span class="c">← оформлення</span>
+<span class="fe">│   ├── app.js               </span><span class="c">← логіка, графіки, карта</span>
+<span class="fe">│   └── config.js            </span><span class="c">← адреса бекенду</span>
+<span class="ot">├── scripts/                 </span><span class="c">← налаштування й перевірка</span>
+<span class="ot">├── docs/                    </span><span class="c">← скріншоти</span>
+<span class="ot">├── .venv/  __pycache__/     </span><span class="c">← створюються автоматично</span>
+<span class="rt">├── .gitignore               </span><span class="c">← що не йде на GitHub</span>
+<span class="rt">├── README.md                </span><span class="c">← опис проєкту</span>
+<span class="rt">├── run.py                   </span><span class="c">← запуск серверів</span>
+<span class="rt">└── ЗАПУСК.bat               </span><span class="c">← запуск подвійним кліком</span></div>
+
+  <!-- ===================== БЕКЕНД ===================== -->
+  <h2 id="backend" class="be">1. backend/ — серверна частина</h2>
+
+  <div class="card be"><div class="name">backend/api/main.py</div>
+    <p>Головний файл API на FastAPI. Тут описано 12 ендпоїнтів (адрес), які повертають дані:
+      <code>/api/kpi</code> (показники), <code>/api/trend</code> (динаміка), <code>/api/events</code> (журнал подій),
+      <code>/api/units</code> (підрозділи) тощо.</p>
+    <ul>
+      <li>Усі SQL-запити параметризовані, тому SQL-ін'єкції неможливі.</li>
+      <li>Увімкнено CORS: фронтенд з іншого порту може звертатися до API.</li>
+    </ul></div>
+
+  <div class="card be"><div class="name">backend/api/db.py</div>
+    <p>Підключення до PostgreSQL (бібліотека psycopg2): відкриває з'єднання, виконує запит, повертає результат і
+      закриває з'єднання. Рядок підключення бере з <code>.env</code>.</p></div>
+
+  <div class="card be"><div class="name">backend/api/__init__.py</div>
+    <p>Порожній файл. Позначає для Python, що папка <code>api</code> — це пакет, тож можна писати
+      <code>from api.db import ...</code>.</p></div>
+
+  <div class="card be"><div class="name">backend/requirements.txt</div>
+    <p>Список бібліотек Python для бекенду: <code>fastapi</code>, <code>uvicorn</code> (сервер),
+      <code>psycopg2</code> (PostgreSQL), <code>python-dotenv</code> (читає .env).
+      Усі встановлюються однією командою <code>pip install -r requirements.txt</code>.</p></div>
+
+  <div class="card be"><div class="name">backend/.env <span class="tag">НЕ на GitHub</span></div>
+    <p>Секретний файл з паролем до бази (<code>DATABASE_URL</code>). Не потрапляє на GitHub завдяки .gitignore.</p></div>
+
+  <div class="card be"><div class="name">backend/.env.example <span class="tag ok">на GitHub</span></div>
+    <p>Зразок <code>.env</code> без справжнього пароля. Інший розробник бачить, які налаштування треба заповнити.</p></div>
+
+  <!-- ===================== БАЗА ДАНИХ ===================== -->
+  <h2 id="database" class="db">2. backend/db/ — база даних</h2>
+
+  <div class="card db"><div class="name">backend/db/schema.sql</div>
+    <p>Структура бази: 6 таблиць (<code>regions</code>, <code>directions</code>, <code>event_types</code>,
+      <code>units</code>, <code>events</code>, <code>frontline_points</code>), зв'язки між ними (зовнішні ключі),
+      індекси для швидкого пошуку і представлення (VIEW) <code>v_events</code>.</p></div>
+
+  <div class="card db"><div class="name">backend/db/seed.py</div>
+    <p>Генератор синтетичних (вигаданих) даних: 109 підрозділів, 1537 подій за 60 діб, умовна лінія.
+      Записує .sql-файли й завантажує дані в базу.</p></div>
+
+  <div class="card db"><div class="name">backend/db/data.sql</div>
+    <p>Лише дані (команди <code>INSERT</code>), без структури.</p></div>
+
+  <div class="card db"><div class="name">backend/db/oko_dashboard.sql <span class="tag ok">ДЛЯ ЗДАЧІ</span></div>
+    <p>Структура й усі дані одним файлом. З нього всю базу можна відновити однією командою <code>psql</code>.</p></div>
+
+  <!-- ===================== ФРОНТЕНД ===================== -->
+  <h2 id="frontend" class="fe">3. frontend/ — клієнтська частина (у браузері)</h2>
+
+  <div class="card fe"><div class="name">frontend/index.html</div>
+    <p>Розмітка сторінки: шапка, фільтри, картки KPI, місце для карти, графіків і таблиці подій.</p></div>
+
+  <div class="card fe"><div class="name">frontend/styles.css</div>
+    <p>Оформлення за брендбуком: темно-зелений <code>#005a34</code> і жовтий <code>#ffdd00</code>,
+      розташування блоків, адаптивність.</p></div>
+
+  <div class="card fe"><div class="name">frontend/app.js</div>
+    <p>Логіка сторінки: бере дані з API (<code>fetch</code>), будує 7 графіків (Chart.js), карту OpenStreetMap
+      (Leaflet) з умовними знаками APP-6D (milsymbol), обробляє фільтри, сортування й пагінацію.</p></div>
+
+  <div class="card fe"><div class="name">frontend/config.js</div>
+    <p>Налаштування фронтенду: адреса бекенду (<code>API_BASE</code>). Якщо бекенд переїде на інший сервер чи порт,
+      змінювати доведеться лише цей файл.</p></div>
+
+  <!-- ===================== КОРІНЬ ===================== -->
+  <h2 id="root" class="rt">4. Файли в корені проєкту</h2>
+
+  <div class="card rt"><div class="name">.gitignore</div>
+    <p>Список файлів і папок, які Git <b>не</b> відстежує і не завантажує на GitHub. У нашому проєкті:</p>
+    <ul>
+      <li><code>.env</code>: містить пароль до бази, а секрети публікувати не можна;</li>
+      <li><code>.venv/</code>, <code>venv/</code>: віртуальне середовище Python із сотнями МБ бібліотек; кожен створює його в себе з requirements.txt;</li>
+      <li><code>__pycache__/</code>, <code>*.pyc</code>: тимчасові скомпільовані файли Python, які створюються автоматично.</li>
+    </ul>
+    <div class="say" style="margin-bottom:0">Коротко: «щоб не викласти пароль і не засмічувати репозиторій файлами,
+      які можна відтворити автоматично».</div></div>
+
+  <div class="card rt"><div class="name">README.md</div>
+    <p>Опис проєкту: що зроблено, як запустити, список API. GitHub показує його на сторінці папки.</p></div>
+
+  <div class="card rt"><div class="name">run.py</div>
+    <p>Скрипт запуску. Перевіряє підключення до бази й запускає сервери:</p>
+    <ul>
+      <li><code>python run.py</code>: обидва сервери;</li>
+      <li><code>python run.py backend</code>: лише бекенд;</li>
+      <li><code>python run.py frontend</code>: лише фронтенд.</li>
+    </ul></div>
+
+  <div class="card rt"><div class="name">ЗАПУСК.bat</div>
+    <p>Запуск подвійним кліком у Windows, без терміналу. Під час першого запуску відкриває налаштування, далі запускає
+      <code>run.py</code> (обидва сервери).</p></div>
+
+  <!-- ===================== ІНШЕ ===================== -->
+  <h2 id="other" class="ot">5. Інші папки</h2>
+
+  <div class="card ot"><div class="name">scripts/setup_windows.ps1</div>
+    <p>Одноразове налаштування: знаходить PostgreSQL, питає пароль, створює .env, базу, віртуальне середовище й
+      завантажує дані.</p></div>
+
+  <div class="card ot"><div class="name">scripts/_env.ps1</div>
+    <p>Допоміжний скрипт: читає .env для PowerShell-скриптів.</p></div>
+
+  <div class="card ot"><div class="name">scripts/smoke_test.py</div>
+    <p>Автоматична перевірка API: звертається до 10 ендпоїнтів і для кожного пише OK або FAIL.
+      Smoke test — це швидка перевірка, що все загалом працює.</p></div>
+
+  <div class="card ot"><div class="name">docs/</div>
+    <p>Скріншоти дашборда для README.</p></div>
+
+  <div class="card ot"><div class="name">.venv/ <span class="tag">НЕ на GitHub</span></div>
+    <p>Віртуальне середовище Python: окрема копія Python із бібліотеками саме для цього проєкту, щоб не конфліктувати
+      з іншими проєктами.</p></div>
+
+  <div class="card ot"><div class="name">__pycache__/ <span class="tag">НЕ на GitHub</span></div>
+    <p>Кеш Python зі скомпільованими .pyc-файлами для швидшого запуску. Створюється автоматично, його можна видаляти.</p></div>
+
+  <!-- ===================== ПИТАННЯ ===================== -->
+  <h2 id="questions" class="qa">6. Можливі питання викладача</h2>
+
+  <div class="qa-item"><b>Навіщо ділити на фронтенд і бекенд?</b>
+    <p>Кожна частина відповідає за своє: бекенд — за дані й безпечний доступ до бази, фронтенд — за відображення.
+      Їх можна змінювати й розгортати окремо, а той самий API може обслуговувати інший клієнт
+      (мобільний застосунок, інший сайт).</p></div>
+
+  <div class="qa-item"><b>Чому браузер не бере дані з бази напряму?</b>
+    <p>Тоді пароль до бази був би в браузері, і будь-хто міг би його побачити. Бекенд стоїть посередині й віддає лише
+      дозволені дані.</p></div>
+
+  <div class="qa-item"><b>Що таке API і ендпоїнт?</b>
+    <p>API — набір адрес, за якими програма віддає дані. Ендпоїнт — одна така адреса: наприклад, <code>/api/kpi</code>
+      повертає показники у форматі JSON.</p></div>
+
+  <div class="qa-item"><b>Що таке CORS?</b>
+    <p>Правило браузера: сторінка з однієї адреси (порт 8080) не може брати дані з іншої (порт 8020), якщо сервер
+      цього не дозволив. У бекенді CORS увімкнено, тобто фронтенду це дозволено.</p></div>
+
+  <div class="qa-item"><b>Що таке JSON?</b>
+    <p>Текстовий формат обміну даними, наприклад <code>{"total_events": 1537, ...}</code>.</p></div>
+
+  <div class="qa-item"><b>Де подивитися всі ендпоїнти?</b>
+    <p><code>http://localhost:8020/docs</code> — автоматична документація Swagger, яку генерує FastAPI.
+      Там кожен запит можна виконати кнопкою.</p></div>
+
+  <div class="qa-item"><b>Звідки дані?</b>
+    <p>Їх згенерував скрипт <code>seed.py</code>, тобто вони синтетичні. Реальних даних у проєкті немає.</p></div>
+
+  <div class="qa-item"><b>Чому .env не на GitHub, а .env.example є?</b>
+    <p>У <code>.env</code> справжній пароль, а це секрет. <code>.env.example</code> — лише шаблон, з якого видно,
+      які налаштування потрібні.</p></div>
+
+  <div class="qa-item"><b>Як захищено від SQL-ін'єкцій?</b>
+    <p>Значення з фільтрів не вставляються в текст SQL, а передаються окремо як параметри (<code>%s</code>).
+      Для сортування діє білий список дозволених стовпців.</p></div>
+</main>
+</body>
+</html>

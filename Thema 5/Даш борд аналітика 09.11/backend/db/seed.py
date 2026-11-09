@@ -265,7 +265,7 @@ def main():
     data_sql = build(args.seed, args.days, args.end)
     schema_sql = (DB_DIR / "schema.sql").read_text(encoding="utf-8")
     full_sql = ("-- ОКО: дашборд аналітика. Повний скрипт БД (схема + синтетичні дані).\n"
-                "-- Виконання: psql -d oko_dashboard -f db/oko_dashboard.sql\n"
+                "-- Виконання: psql -d oko_dashboard -f backend/db/oko_dashboard.sql\n"
                 "SET client_encoding = 'UTF8';\n\n" + schema_sql + "\n" + data_sql)
     (DB_DIR / "data.sql").write_text(data_sql, encoding="utf-8")
     (DB_DIR / "oko_dashboard.sql").write_text(full_sql, encoding="utf-8")

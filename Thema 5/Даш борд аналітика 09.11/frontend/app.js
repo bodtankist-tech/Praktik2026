@@ -1,11 +1,12 @@
 "use strict";
-/* ОКО: дашборд аналітика. Дані надходять з FastAPI (той самий сервер, префікс /api). */
+/* ОКО: дашборд аналітика (фронтенд). Дані надходять з бекенду FastAPI; адресу задано в config.js. */
 
-const API = location.protocol === "file:" ? "http://localhost:8020/api" : "/api";
+const API = (window.OKO_CONFIG && window.OKO_CONFIG.API_BASE) || "http://localhost:8020/api";
+const FRONTEND_URL = "http://localhost:8080/";
 
-// Відкрито подвійним кліком (file://)? Якщо сервер працює — переходимо на нього, інакше покаже банер з підказкою.
+// Відкрито подвійним кліком (file://)? Якщо фронтенд-сервер працює — переходимо на нього, інакше покаже банер з підказкою.
 if (location.protocol === "file:") {
-  fetch(API + "/health").then((r) => { if (r.ok) location.replace("http://localhost:8020/"); }).catch(() => {});
+  fetch(FRONTEND_URL, { mode: "no-cors" }).then(() => location.replace(FRONTEND_URL)).catch(() => {});
 }
 
 /* ================= кольори (див. styles.css) ================= */
@@ -122,7 +123,7 @@ const START_BOUNDS = [[46.0, 31.0], [51.4, 39.0]]; // район умовної 
 const map = L.map("map", { zoomControl: true, preferCanvas: true, minZoom: 5 }).fitBounds(START_BOUNDS);
 map.on("zoomend", () => { if (lastUnits.length) drawUnits(); });
 // Тайли OpenStreetMap віддаються лише сторінкам, відкритим через http:// (OSM вимагає заголовок Referer;
-// у file:// його немає, і замість карти буде «Access blocked»). Тому сторінку відкривати з сервера: http://localhost:8020
+// у file:// його немає, і замість карти буде «Access blocked»). Тому сторінку відкривати з фронтенд-сервера: http://localhost:8080
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 14, attribution: "© OpenStreetMap contributors",
 }).addTo(map);
@@ -500,8 +501,8 @@ function showError(err) {
     document.querySelector("main").prepend(box);
   }
   box.textContent = `Помилка звернення до API: ${err.message}. ` + (location.protocol === "file:"
-    ? "Сторінку відкрито як файл. Запустіть scripts\\setup_windows.ps1 і відкрийте http://localhost:8020"
-    : "Перевірте, що сервер запущено (див. README).");
+    ? "Сторінку відкрито як файл. Запустіть ЗАПУСК.bat і відкрийте http://localhost:8080"
+    : `Перевірте, що бекенд запущено (${API}, див. README).`);
 }
 
 async function refresh() {

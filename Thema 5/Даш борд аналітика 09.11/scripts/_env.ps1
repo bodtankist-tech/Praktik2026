@@ -1,5 +1,5 @@
-﻿# Допоміжний файл: читає .env у змінні середовища поточного процесу PowerShell.
-$envFile = Join-Path (Join-Path $PSScriptRoot "..") ".env"
+﻿# Допоміжний файл: читає backend\.env у змінні середовища поточного процесу PowerShell.
+$envFile = Join-Path (Join-Path (Join-Path $PSScriptRoot "..") "backend") ".env"
 if (Test-Path $envFile) {
     Get-Content $envFile | ForEach-Object {
         if ($_ -match '^\s*([^#=\s][^=]*)=(.*)$') {

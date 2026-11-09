@@ -2,15 +2,14 @@
 
 Аналітичні ендпоїнти подій приймають однакові необов'язкові фільтри:
 from, to (YYYY-MM-DD), region, direction, event_type, min_intensity.
-Той самий застосунок віддає веб-інтерфейс (папка web/) за адресою «/».
+Це лише бекенд (JSON API). Веб-інтерфейс — окремий фронтенд у папці frontend/ (свій сервер, порт 8080),
+він звертається сюди через CORS.
 """
 from datetime import date, datetime, timedelta
-from pathlib import Path
 from typing import Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 
 from .db import fetch_all, fetch_one
 
@@ -291,6 +290,3 @@ def units_summary(region: Optional[str] = None, direction: Optional[str] = None)
     out["status"] = [{"affiliation": r["affiliation"], "status": r["status"], "n": r["n"]} for r in status]
     return out
 
-
-# ------------------------------------------------------------------ веб-інтерфейс
-app.mount("/", StaticFiles(directory=Path(__file__).resolve().parent.parent / "web", html=True), name="web")
