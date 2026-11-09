@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ОКО · Дашборд аналітика</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">ОКО</span>
+      <div>
+        <h1>Дашборд аналітика</h1>
+        <p>Оперативна обстановка · навчальна ІАС · <strong>усі дані синтетичні</strong></p>
+      </div>
+    </div>
+    <div class="status">
+      <span id="api-status" class="dot" title="Стан API"></span>
+      <span id="data-range">Дані: —</span>
+    </div>
+  </header>
+
+  <form id="filters" class="filters" autocomplete="off">
+    <label>З <input type="date" id="f-from"></label>
+    <label>По <input type="date" id="f-to"></label>
+    <div class="quick" role="group" aria-label="Швидкий період">
+      <button type="button" data-days="7">7 діб</button>
+      <button type="button" data-days="14">14</button>
+      <button type="button" data-days="30">30</button>
+      <button type="button" data-days="0">Весь</button>
+    </div>
+    <label>Напрямок <select id="f-direction"><option value="">усі</option></select></label>
+    <label>Область <select id="f-region"><option value="">усі</option></select></label>
+    <label>Тип події <select id="f-type"><option value="">усі</option></select></label>
+    <label>Інтенсивність ≥ <select id="f-intensity">
+      <option value="">будь-яка</option><option>3</option><option>5</option><option>7</option><option>9</option>
+    </select></label>
+    <button type="submit" class="primary">Застосувати</button>
+    <button type="button" id="f-reset">Скинути</button>
+  </form>
+
+  <main>
+    <section class="kpis" id="kpis" aria-label="Ключові показники"></section>
+
+    <section class="map-row">
+      <div class="card map-card">
+        <div class="card-head">
+          <h2>Карта обстановки</h2>
+          <span class="hint">Позначки підрозділів за APP-6D · клік по об'єкту — деталі</span>
+        </div>
+        <div id="map" role="region" aria-label="Карта України з позначками"></div>
+      </div>
+
+      <aside class="card side">
+        <h2>Шари</h2>
+        <div class="layers">
+          <label><input type="checkbox" data-layer="friend" checked> Свої підрозділи <span id="n-friend" class="count"></span></label>
+          <label><input type="checkbox" data-layer="hostile" checked> Підрозділи противника <span id="n-hostile" class="count"></span></label>
+          <label><input type="checkbox" data-layer="events" checked> Події за фільтром <span id="n-events" class="count"></span></label>
+          <label><input type="checkbox" data-layer="line" checked> Умовна лінія зіткнення</label>
+          <label><input type="checkbox" id="labels-toggle"> Підписи підрозділів</label>
+        </div>
+
+        <h2>Умовні позначення</h2>
+        <ul class="legend">
+          <li><span class="sym" id="leg-friend"></span> Свої (APP-6D: синя рамка)</li>
+          <li><span class="sym" id="leg-hostile"></span> Противник (APP-6D: червоний ромб)</li>
+          <li><span class="swatch" style="--c: var(--cat-fire)"></span> Вогневе ураження</li>
+          <li><span class="swatch" style="--c: var(--cat-ground)"></span> Наземні дії</li>
+          <li><span class="swatch" style="--c: var(--cat-intel)"></span> Розвідка та РЕБ</li>
+          <li><span class="line-sample"></span> Умовна лінія (синтетична)</li>
+          <li class="muted">Розмір кола — інтенсивність 1–10</li>
+        </ul>
+
+        <h2>Обраний об'єкт</h2>
+        <div id="details" class="details muted">Клікніть по позначці на карті або рядку таблиці.</div>
+      </aside>
+    </section>
+
+    <section class="charts">
+      <div class="card wide">
+        <div class="card-head">
+          <h2>Динаміка подій</h2>
+          <div class="seg" role="group" aria-label="Крок">
+            <button type="button" data-group="day" class="on">доба</button>
+            <button type="button" data-group="week">тиждень</button>
+          </div>
+        </div>
+        <div class="chart-box"><canvas id="ch-trend"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Події за типами</h2><span class="hint">клік — фільтр</span></div>
+        <div class="chart-box tall"><canvas id="ch-types"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Події за напрямками</h2><span class="hint">клік — фільтр</span></div>
+        <div class="chart-box tall"><canvas id="ch-directions"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Розподіл за годиною доби</h2></div>
+        <div class="chart-box"><canvas id="ch-hourly"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Підрозділи сторін за типами</h2></div>
+        <div class="chart-box tall"><canvas id="ch-forces"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Боєздатність підрозділів</h2></div>
+        <div class="chart-box"><canvas id="ch-status"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>Події за областями</h2></div>
+        <div class="chart-box tall"><canvas id="ch-regions"></canvas></div>
+      </div>
+    </section>
+
+    <section class="card table-card">
+      <div class="card-head">
+        <h2>Журнал подій</h2>
+        <span id="table-info" class="hint"></span>
+      </div>
+      <div class="table-wrap">
+        <table id="events-table">
+          <thead>
+            <tr>
+              <th data-sort="occurred_at">Час</th>
+              <th data-sort="event_type">Подія</th>
+              <th data-sort="direction">Напрямок</th>
+              <th data-sort="region">Область</th>
+              <th data-sort="intensity" class="num">Інт.</th>
+              <th data-sort="reliability">Оцінка</th>
+              <th>Джерело</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <button type="button" id="pg-prev">‹ Назад</button>
+        <span id="pg-info"></span>
+        <button type="button" id="pg-next">Далі ›</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>Навчальна робота. Підрозділи, події, координати й лінія зіткнення вигадані. Картографічна основа © OpenStreetMap contributors.</footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/milsymbol@2.2.0/dist/milsymbol.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
