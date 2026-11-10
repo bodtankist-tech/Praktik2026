@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#09172a">
+  <meta name="description" content="Інтерактивний навчальний тренажер: побудова мережевого графіка, прямий і зворотний прохід, резерви часу та критичний шлях.">
+  <title>Мережеве планування — інтерактивний тренажер | Тема 3, заняття 2</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none"><path d="M24 4 43 14v20L24 44 5 34V14L24 4Z" stroke="currentColor" stroke-width="1.7"/><path d="m12 28 8-9 7 6 9-11M36 14v8m0-8h-8" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="28" r="2" fill="currentColor"/><circle cx="20" cy="19" r="2" fill="currentColor"/><circle cx="27" cy="25" r="2" fill="currentColor"/></svg>
+      </div>
+      <div class="brand-title"><span class="topline">СИСТЕМИ ТА МЕТОДИ ПІДТРИМКИ ПРИЙНЯТТЯ РІШЕНЬ</span><strong>Мережеве планування <span class="accent">/ Лабораторія</span></strong></div>
+      <div class="offline-flag"><span class="status-dot"></span> АВТОНОМНА ВЕРСІЯ</div>
+    </div>
+  </header>
+  <div class="page-wrap">
+    <section class="intro">
+      <div><div class="eyebrow"><span class="mini-chip">ТЕМА 3 · ЗАНЯТТЯ 2</span> ДЛЯ ВІЙСЬКОВИХ АНАЛІТИКІВ</div>
+      <h1>Від переліку робіт — <span>до критичного шляху</span></h1>
+      <p>Створюйте мережеві графіки, змінюйте залежності й тривалості, обчислюйте часові параметри та перевіряйте власні рішення на практиці.</p></div>
+      <div class="intro-quick"><div class="quick-number">6 <span>кроків</span></div><div>Один розрахунковий приклад проходить через увесь тренажер. Дані можна змінювати.</div></div>
+    </section>
+    <nav id="nav" class="tabbar" aria-label="Розділи тренажера"></nav>
+    <section id="dashboard" class="dashboard" aria-label="Робочий мережевий графік">
+      <div class="dashboard-head"><div><div class="section-kicker">РОБОЧА МОДЕЛЬ</div><h2 id="graph-title">Мережевий графік</h2><p id="graph-subtitle">Події — вузли; роботи — стрілки. Виберіть вузол або роботу для пояснення.</p></div>
+        <div class="graph-actions"><label class="switch-label"><input id="show-critical" type="checkbox" checked> Виділити критичний шлях</label><label class="switch-label"><input id="show-times" type="checkbox" checked> Час подій</label><button type="button" class="small-btn" id="reset-view">↺ Приклад</button></div>
+      </div>
+      <div class="graph-area"><div class="graph-scroll"><svg id="network" viewBox="0 0 980 390" role="img" aria-label="Інтерактивна мережева схема з подіями та роботами" xmlns="http://www.w3.org/2000/svg"></svg></div></div>
+      <div class="graph-bottom"><div class="legend"><span><i class="legend-line critical"></i> критичний шлях</span><span><i class="legend-line normal"></i> некритична робота</span><span><i class="legend-ring"></i> подія</span></div><div id="selection-description" class="selection-description" aria-live="polite">Натисніть на будь-яку стрілку або вузол графіка.</div></div>
+      <div class="metrics" id="metrics" aria-live="polite"></div>
+      <div id="model-errors" aria-live="polite"></div>
+    </section>
+    <main id="content" tabindex="-1"></main>
+    <footer class="footer"><span>Навчальна модель CPM / PERT-мереж · «роботи на стрілках» (AOA)</span><span>Дані та прогрес зберігаються лише в цьому браузері. Зовнішні сервіси не потрібні.</span></footer>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="lightbox" class="lightbox" aria-hidden="true"><div class="lightbox-top"><span id="lightbox-caption"></span><div><button id="lightbox-prev" aria-label="Попередня інфографіка">←</button><button id="lightbox-next" aria-label="Наступна інфографіка">→</button><button id="lightbox-close" aria-label="Закрити перегляд">✕</button></div></div><img id="lightbox-image" alt="Інфографіка навчального заняття"></div>
+  <input id="file-import" type="file" accept=".json,application/json" hidden>
+</body>
+</html>
