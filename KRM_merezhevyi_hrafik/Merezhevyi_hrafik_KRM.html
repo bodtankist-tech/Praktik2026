@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Мережевий графік виконання КРМ – Щербаков Б. В.</title>
+<style>
+  :root{--ink:#1d2530;--muted:#5b6673;--line:#c9d1da;--bg:#f6f8fa;--card:#fff;--crit:#c62828;--norm:#2f4f6f;--done:#2e7d32;--prog:#ef6c00;--dummy:#8a96a3}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg);font-size:14px;line-height:1.45}
+  header{background:#22313f;color:#fff;padding:18px 28px}
+  header h1{margin:0 0 4px;font-size:21px;font-weight:600}
+  header .sub{font-size:13.5px;opacity:.9}
+  main{padding:18px 28px 40px;max-width:1500px;margin:0 auto}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 18px;margin-bottom:16px}
+  .card h2{font-size:16px;margin:0 0 10px;font-weight:600}
+  .controls{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end}
+  .controls label{display:flex;flex-direction:column;font-size:12.5px;color:var(--muted);gap:3px}
+  input[type=date]{font:inherit;font-size:13px;padding:3px 5px;border:1px solid var(--line);border-radius:4px}
+  select{font:inherit;font-size:13px;padding:2px 4px;border:1px solid var(--line);border-radius:4px}
+  button{font:inherit;font-size:13px;padding:6px 12px;border:1px solid #9aa7b4;background:#fff;border-radius:5px;cursor:pointer}
+  button:hover{background:#eef2f6}
+  .kpis{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px}
+  .kpi{flex:1 1 210px;border:1px solid var(--line);border-radius:6px;padding:9px 12px;background:#fbfcfd}
+  .kpi .v{font-size:19px;font-weight:600}
+  .kpi .l{font-size:12px;color:var(--muted)}
+  .kpi.bad .v{color:var(--crit)} .kpi.ok .v{color:var(--done)}
+  .scroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:#fff}
+  svg text{font-family:"Segoe UI",Roboto,Arial,sans-serif}
+  .legend{display:flex;flex-wrap:wrap;gap:18px;font-size:12.5px;color:var(--muted);margin-top:10px;align-items:center}
+  .legend span.sw{display:inline-block;width:28px;height:0;border-top:2.5px solid;vertical-align:middle;margin-right:6px}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th,td{border:1px solid var(--line);padding:4px 6px;text-align:center;vertical-align:middle}
+  th{background:#eef2f6;font-weight:600}
+  td.name{text-align:left}
+  tr.crit td.name{font-weight:600}
+  tr.done td{background:#f3f8f3}
+  tr.prog td{background:#fff6ec}
+  td input[type=number]{width:54px;font:inherit;padding:2px 4px;border:1px solid var(--line);border-radius:3px;text-align:center}
+  .pos{color:var(--done);font-weight:600} .neg{color:var(--crit);font-weight:600}
+  .note{font-size:12.5px;color:var(--muted)}
+  .note li{margin-bottom:4px}
+  .formula{font-family:Consolas,monospace;font-size:12.5px;background:#f3f5f7;padding:1px 4px;border-radius:3px}
+  .tabs{display:flex;gap:6px;margin-bottom:10px}
+  .tabs button.on{background:#22313f;color:#fff;border-color:#22313f}
+  @media print{
+    @page{size:A3 landscape;margin:10mm}
+    body{background:#fff;font-size:11px}
+    header{background:#fff;color:#000;padding:0 0 6px;border-bottom:1px solid #000}
+    .noprint{display:none!important}
+    .card{border:none;padding:4px 0;break-inside:avoid}
+    .scroll{overflow:visible;border:none}
+    main{padding:0;max-width:none}
+    td input,td select{border:none;background:none;-webkit-appearance:none;appearance:none}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Мережевий графік виконання кваліфікаційної роботи магістра</h1>
+  <div class="sub">Побудовано за календарним планом виконання КРМ · майор Богдан ЩЕРБАКОВ · керівник – полковник Дмитро ІЛЬЇН · тема: “Обґрунтування рекомендацій щодо впровадження сучасних інформаційних технологій в роботу інформаційно-аналітичних підрозділів”</div>
+</header>
+<main>
+
+<section class="card noprint">
+  <h2>Вихідні дані</h2>
+  <div class="controls">
+    <label>Дата початку робіт (подія 1)
+      <input type="date" id="startDate">
+    </label>
+    <label>Поточна дата (для прогнозу)
+      <input type="date" id="nowDate">
+    </label>
+    <button id="btnReset" title="Повернути початкові значення">Скинути</button>
+    <button id="btnSvg">Зберегти мережевий графік (SVG)</button>
+    <button onclick="window.print()">Друк / PDF</button>
+  </div>
+  <div class="kpis" id="kpis"></div>
+</section>
+
+<section class="card">
+  <h2>Мережевий графік</h2>
+  <div class="tabs noprint">
+    <button id="tabPlan" class="on">Параметри за календарним планом</button>
+    <button id="tabFact">Фактичний стан і прогноз</button>
+  </div>
+  <div class="scroll"><svg id="net" xmlns="http://www.w3.org/2000/svg"></svg></div>
+  <div class="legend">
+    <span><span class="sw" style="border-color:var(--crit)"></span>критичний шлях календарного плану</span>
+    <span><span class="sw" style="border-color:var(--norm)"></span>робота з резервом часу</span>
+    <span><span class="sw" style="border-color:var(--done)"></span>виконано</span>
+    <span><span class="sw" style="border-color:var(--prog)"></span>виконується</span>
+    <span><span class="sw" style="border-color:var(--dummy);border-top-style:dashed"></span>фіктивна робота (залежність)</span>
+    <span id="sectorLegend"></span>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Календарний графік: план і прогноз</h2>
+  <div class="scroll"><svg id="gantt" xmlns="http://www.w3.org/2000/svg"></svg></div>
+  <div class="legend">
+    <span><span class="sw" style="border-color:#b0bec5;border-top-width:8px"></span>строк за календарним планом</span>
+    <span><span class="sw" style="border-color:#cfd8dc;border-top-width:4px"></span>резерв роботи в плані</span>
+    <span><span class="sw" style="border-color:var(--prog);border-top-width:8px"></span>прогноз робіт, що залишилися</span>
+    <span><b style="color:#2e7d32">◆</b> фактична дата виконання · <b style="color:#2e7d32">✓</b> виконано (дату не вказано)</span>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Перелік робіт і параметри мережевого графіка</h2>
+  <p class="note noprint">Строки й тривалості плану взято з календарного плану. Статус і фактичну дату виконання можна змінити в таблиці. Для робіт, що виконуються або ще не розпочаті, задається тривалість, що залишилася (прогноз). Зміни зберігаються в цьому браузері.</p>
+  <div style="overflow-x:auto"><table id="tbl"></table></div>
+</section>
+
+<section class="card">
+  <h2>Методика та примітки</h2>
+  <ul class="note">
+    <li>Роботи мережі відповідають пунктам 1–13 календарного плану. Подія – завершення роботи. Плановий строк події – термін виконання з календарного плану. Тривалість роботи t(i,j) дорівнює різниці планових строків її кінцевої й початкової подій.</li>
+    <li>Залежності: вступ, розділи 1–3 і статті 1–3 передують завершенню написання роботи (п. 10). Стаття 1 виконується після розділу 1, стаття 2 – після розділу 2, стаття 3 – після розділу 3, як у календарному плані.</li>
+    <li>Параметри: <span class="formula">Tр(j) = max[Tр(i) + t(i,j)]</span>; <span class="formula">Tп(i) = min[Tп(j) − t(i,j)]</span>; резерв події <span class="formula">R(i) = Tп(i) − Tр(i)</span>; повний резерв роботи <span class="formula">Rп(i,j) = Tп(j) − Tр(i) − t(i,j)</span>; вільний резерв <span class="formula">Rв(i,j) = Tр(j) − Tр(i) − t(i,j)</span>. Пізній строк завершальної події дорівнює терміну п. 13 (20.05.2027). Строки в секторах подано в днях від дати початку робіт.</li>
+    <li>Прогноз: виконані роботи закінчуються фактичною датою. Якщо її не задано, вважається, що роботу виконано вчасно (строк уже минув) або не пізніше поточної дати (строк ще не настав); тоді відхилення подано як “≥ +N”. Роботи, що залишилися, починаються не раніше поточної дати і тривають задану кількість днів. Відхилення від плану = плановий строк − прогнозна (фактична) дата: “+” – випередження, “−” – відставання.</li>
+    <li>Методика виконання та захисту КРМ НУОУ (с. 12, 14) передбачає між відгуком і рецензією ще брошурування роботи та перевірку на оригінальність (заява – додаток И, висновок – додаток К). У календарному плані вони окремо не виділені й тому на графік не нанесені.</li>
+  </ul>
+</section>
+</main>
+
+<script>
+"use strict";
+// ---------- Календарний план (пункти 1–13) ----------
+const PLAN_START = "2025-09-01";
+const EVENTS = {
+  1:{c:0, r:0,  name:"Початок робіт"},
+  2:{c:1, r:0,  name:"Завдання на КРМ отримано"},
+  3:{c:2, r:0,  name:"Тему усвідомлено, матеріали й літературу підібрано"},
+  4:{c:3, r:0,  name:"Розділ 1 відпрацьовано"},
+  5:{c:4, r:1,  name:"Статтю 1 відпрацьовано"},
+  6:{c:5, r:0,  name:"Розділ 2 відпрацьовано"},
+  7:{c:6, r:1,  name:"Статтю 2 відпрацьовано"},
+  8:{c:7, r:0,  name:"Розділ 3 відпрацьовано"},
+  9:{c:8, r:0,  name:"Статтю 3 відпрацьовано; вступ, розділи й статті готові"},
+  10:{c:9, r:0, name:"Написання КРМ завершено"},
+  11:{c:10,r:0, name:"Закінчену роботу подано керівнику"},
+  12:{c:11,r:0, name:"Зауваження усунено, відгук керівника отримано"},
+  13:{c:12,r:0, name:"Рецензію на роботу отримано"}
+};
+// n – номер пункту календарного плану; d – термін виконання за планом
+const ACTS_DEFAULT = [
+  {n:1,  i:1, j:2,  s:"Отримання завдання", name:"Отримання завдання на кваліфікаційну роботу магістра", d:"2025-10-01", st:"done"},
+  {n:2,  i:2, j:3,  s:"Тема, література", name:"Усвідомлення теми, змісту основних питань та підбір матеріалів і літератури для написання кваліфікаційної роботи магістра", d:"2025-10-30", st:"done"},
+  {n:3,  i:3, j:9,  s:"Вступна частина", name:"Відпрацювання вступної частини", d:"2025-12-30", st:"done", via:[[2.3,-1],[7.7,-1]]},
+  {n:4,  i:3, j:4,  s:"Розділ 1", name:"Відпрацювання 1-го розділу кваліфікаційної роботи магістра", d:"2026-06-01", st:"done"},
+  {n:5,  i:4, j:5,  s:"Стаття 1", name:"Відпрацювання 1-ї статті", d:"2026-06-10", st:"done"},
+  {n:6,  i:4, j:6,  s:"Розділ 2", name:"Відпрацювання 2-го розділу кваліфікаційної роботи магістра", d:"2026-12-20", st:"done"},
+  {n:7,  i:6, j:7,  s:"Стаття 2", name:"Відпрацювання 2-ї статті", d:"2026-12-28", st:"done"},
+  {n:8,  i:6, j:8,  s:"Розділ 3", name:"Відпрацювання 3-го розділу кваліфікаційної роботи магістра", d:"2027-01-20", st:"done"},
+  {n:9,  i:8, j:9,  s:"Стаття 3", name:"Відпрацювання 3-ї статті", d:"2027-04-24", st:"done"},
+  {n:10, i:9, j:10, s:"Завершення написання", name:"Завершення написання кваліфікаційної роботи магістра", d:"2027-05-01", st:"prog", rem:5},
+  {n:11, i:10,j:11, s:"Подання керівнику", name:"Подання закінченої роботи керівнику", d:"2027-05-01", st:"todo", rem:0},
+  {n:12, i:11,j:12, s:"Коригування, відгук", name:"Коригування кваліфікаційної роботи магістра та усунення зауважень керівника (отримання відгуку керівника)", d:"2027-05-18", st:"todo", rem:17},
+  {n:13, i:12,j:13, s:"Рецензія", name:"Подання роботи на рецензію (отримання рецензії на роботу)", d:"2027-05-20", st:"todo", rem:2},
+  {i:5, j:9, dummy:true, via:[[4.3,2],[7.7,2]]},
+  {i:7, j:9, dummy:true}
+];
+const STORE="krm_network_calplan_shcherbakov_v2";
+const ST_NAME={done:"виконано", prog:"виконується", todo:"не розпочато"};
+let ACTS, state, view="plan";
+
+function isoToday(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function loadState(){
+  ACTS=ACTS_DEFAULT.map(a=>Object.assign({fact:""},a));
+  state={start:PLAN_START, now:isoToday()};
+  try{
+    const s=JSON.parse(localStorage.getItem(STORE)||"null");
+    if(s){ state.start=s.start||state.start; state.now=s.now||state.now;
+      (s.acts||[]).forEach(x=>{ const a=ACTS.find(a=>a.n===x.n); if(a){ a.st=x.st; a.fact=x.fact||""; if(x.rem!==undefined) a.rem=x.rem; } }); }
+  }catch(e){}
+}
+function saveState(){ try{ localStorage.setItem(STORE, JSON.stringify({start:state.start, now:state.now, acts:ACTS.filter(a=>!a.dummy).map(a=>({n:a.n,st:a.st,fact:a.fact,rem:a.rem}))})); }catch(e){} }
+
+// ---------- Дати ----------
+function P(s){ const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); }
+function day(s){ return Math.round((P(s)-P(state.start))/86400000); }
+function toDate(n){ const d=P(state.start); d.setDate(d.getDate()+n); return d; }
+function fmt(d){ return String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+"."+d.getFullYear(); }
+function fmtS(d){ return String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+"."+String(d.getFullYear()).slice(2); }
+
+// ---------- Розрахунок ----------
+function compute(){
+  const ids=Object.keys(EVENTS).map(Number).sort((a,b)=>a-b), last=ids[ids.length-1];
+  // плановий строк події = термін роботи, що в неї входить
+  const PD={1:0};
+  ids.forEach(j=>{ if(j===1) return; PD[j]=Math.max(...ACTS.filter(a=>a.j===j).map(a=> a.dummy ? PD[a.i] : day(a.d))); });
+  ACTS.forEach(a=>{ a.t = a.dummy ? 0 : day(a.d)-PD[a.i]; });
+  // мережеві параметри календарного плану
+  const TE={},TL={};
+  ids.forEach(j=>{ TE[j]=0; ACTS.filter(a=>a.j===j).forEach(a=>{ TE[j]=Math.max(TE[j],TE[a.i]+a.t); }); });
+  const Tcr=TE[last];
+  ids.slice().reverse().forEach(i=>{ const out=ACTS.filter(a=>a.i===i); TL[i]= i===last ? Tcr : Math.min(...out.map(a=>TL[a.j]-a.t)); });
+  ACTS.forEach(a=>{ a.ES=TE[a.i]; a.EF=TE[a.i]+a.t; a.LS=TL[a.j]-a.t; a.LF=TL[a.j]; a.Rp=TL[a.j]-TE[a.i]-a.t; a.Rv=TE[a.j]-TE[a.i]-a.t; a.crit=a.Rp===0 && !a.dummy; });
+  ACTS.filter(a=>a.dummy).forEach(a=>{ a.crit=false; });
+  // прогноз від поточного стану
+  const NOW=day(state.now); const F={1:0};
+  ids.forEach(j=>{ if(j===1) return;
+    let f=-1e9;
+    ACTS.filter(a=>a.j===j).forEach(a=>{
+      let fin;
+      if(a.dummy) fin=F[a.i];
+      else if(a.st==="done") fin = a.fact ? day(a.fact) : Math.max(F[a.i], Math.min(day(a.d), NOW)); // без дати: вчасно (якщо строк минув) або не пізніше поточної дати
+      else fin = Math.max(F[a.i], NOW) + Math.max(0, Number(a.rem)||0);
+      a.FS = a.dummy||a.st==="done" ? null : Math.max(F[a.i], NOW); a.FF=fin;
+      f=Math.max(f,fin);
+    });
+    F[j]=f;
+  });
+  const evState={};
+  ids.forEach(j=>{ const inc=ACTS.filter(a=>a.j===j && !a.dummy); evState[j]= j===1 ? "done" : (inc.every(a=>a.st==="done") && ACTS.filter(a=>a.j===j&&a.dummy).every(a=>evState[a.i]==="done") ? "done" : (inc.some(a=>a.st==="prog")?"prog":"todo")); });
+  const evUnk={}; ids.forEach(j=>{ evUnk[j]= ACTS.filter(a=>a.j===j).some(a=> a.dummy ? evUnk[a.i] : (a.st==="done" && !a.fact)); });
+  return {ids,last,PD,TE,TL,Tcr,F,NOW,evState,evUnk};
+}
+
+// ---------- SVG ----------
+const SX=192, X0=84, YMID=200, SY=96, RAD=30;
+const px=c=>X0+c*SX, py=r=>YMID+r*SY;
+function el(tag,attrs,txt){ const e=document.createElementNS("http://www.w3.org/2000/svg",tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(txt!==undefined) e.textContent=txt; return e; }
+function edge(cx,cy,tx,ty,r){ const dx=tx-cx,dy=ty-cy,L=Math.hypot(dx,dy)||1; return [cx+dx/L*r, cy+dy/L*r]; }
+function halo(t){ t.setAttribute("paint-order","stroke"); t.setAttribute("stroke","#fff"); t.setAttribute("stroke-width","3"); return t; }
+const COL={crit:"#c62828",norm:"#2f4f6f",done:"#2e7d32",prog:"#ef6c00",dummy:"#8a96a3"};
+
+function drawNet(R){
+  const svg=document.getElementById("net"); while(svg.firstChild) svg.removeChild(svg.firstChild);
+  const W=X0*2+12*SX, H=py(2)+56;
+  svg.setAttribute("width",W); svg.setAttribute("height",H); svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+  const defs=el("defs",{});
+  Object.entries(COL).forEach(([id,col])=>{ const m=el("marker",{id:"ah-"+id,viewBox:"0 0 10 10",refX:"9",refY:"5",markerWidth:"10",markerHeight:"10",markerUnits:"userSpaceOnUse",orient:"auto-start-reverse"}); m.appendChild(el("path",{d:"M0,0 L10,5 L0,10 z",fill:col})); defs.appendChild(m); });
+  svg.appendChild(defs);
+  svg.appendChild(el("text",{x:14,y:22,"font-size":"12.5","font-weight":"600",fill:"#5b6673"}, view==="plan" ? "Параметри за календарним планом (дні від "+fmt(P(state.start))+")" : "Фактичний стан і прогноз на "+fmt(P(state.now))));
+  // роботи
+  ACTS.forEach(a=>{
+    const A=EVENTS[a.i],B=EVENTS[a.j];
+    const pts=[[px(A.c),py(A.r)]].concat((a.via||[]).map(([c,r])=>[px(c),py(r)])).concat([[px(B.c),py(B.r)]]);
+    const n=pts.length, p0=edge(pts[0][0],pts[0][1],pts[1][0],pts[1][1],RAD), pn=edge(pts[n-1][0],pts[n-1][1],pts[n-2][0],pts[n-2][1],RAD+2);
+    const poly=[p0].concat(pts.slice(1,n-1)).concat([pn]);
+    let kind;
+    if(a.dummy) kind="dummy";
+    else if(view==="plan") kind=a.crit?"crit":"norm";
+    else kind = a.st==="done"?"done":(a.st==="prog"?"prog":(a.crit?"crit":"norm"));
+    const line=el("polyline",{points:poly.map(p=>p.join(",")).join(" "),fill:"none",stroke:COL[kind],"stroke-width":(a.crit&&!a.dummy)?"2.6":"1.6","marker-end":`url(#ah-${kind})`});
+    if(a.dummy) line.setAttribute("stroke-dasharray","5 4");
+    svg.appendChild(line);
+    if(a.dummy) return;
+    let best=0,bi=0; for(let k=0;k<poly.length-1;k++){ const L=Math.hypot(poly[k+1][0]-poly[k][0],poly[k+1][1]-poly[k][1]); if(L>best){best=L;bi=k;} }
+    const mx=(poly[bi][0]+poly[bi+1][0])/2, my=(poly[bi][1]+poly[bi+1][1])/2;
+    const g=el("g",{});
+    g.appendChild(halo(el("text",{x:mx,y:my-6,"font-size":"10.5","text-anchor":"middle",fill:COL[kind],"font-weight":"600"},`${a.n}. ${a.s}`)));
+    let sub;
+    if(view==="plan") sub=`t = ${a.t} · Rп = ${a.Rp}`;
+    else sub = a.st==="done" ? ("виконано"+(a.fact?" "+fmtS(P(a.fact)):"")) : (a.st==="prog" ? `залишилось ${a.rem} дн.` : `прогноз ${a.rem} дн.`);
+    g.appendChild(halo(el("text",{x:mx,y:my+14,"font-size":"10","text-anchor":"middle",fill:COL[kind]},sub)));
+    g.appendChild(el("title",{},`п. ${a.n}. ${a.name}\nтермін за планом: ${fmt(P(a.d))}\nt = ${a.t} дн.; Rп = ${a.Rp}; Rв = ${a.Rv}\nстатус: ${ST_NAME[a.st]}`));
+    svg.appendChild(g);
+  });
+  // події
+  R.ids.forEach(id=>{
+    const E=EVENTS[id], cx=px(E.c), cy=py(E.r);
+    const critEv = R.TL[id]-R.TE[id]===0;
+    let col;
+    if(view==="plan") col = critEv?COL.crit:COL.norm;
+    else col = R.evState[id]==="done"?COL.done:(R.evState[id]==="prog"?COL.prog:(critEv?COL.crit:COL.norm));
+    const g=el("g",{});
+    g.appendChild(el("circle",{cx,cy,r:RAD,fill:"#fff",stroke:col,"stroke-width":critEv?"2.6":"1.6"}));
+    const d=RAD*Math.SQRT1_2;
+    g.appendChild(el("line",{x1:cx-d,y1:cy-d,x2:cx+d,y2:cy+d,stroke:col}));
+    g.appendChild(el("line",{x1:cx+d,y1:cy-d,x2:cx-d,y2:cy+d,stroke:col}));
+    g.appendChild(el("text",{x:cx,y:cy-13,"font-size":"11.5","text-anchor":"middle","font-weight":"700",fill:col},id));
+    if(view==="plan"){
+      g.appendChild(el("text",{x:cx-16,y:cy+4,"font-size":"10","text-anchor":"middle"},R.TE[id]));
+      g.appendChild(el("text",{x:cx+16,y:cy+4,"font-size":"10","text-anchor":"middle"},R.TL[id]));
+      g.appendChild(el("text",{x:cx,y:cy+22,"font-size":"10","text-anchor":"middle"},R.TL[id]-R.TE[id]));
+      g.appendChild(el("text",{x:cx,y:cy+RAD+13,"font-size":"10","text-anchor":"middle",fill:"#5b6673"},fmt(toDate(R.PD[id]))));
+    }else{
+      const dev=R.PD[id]-R.F[id], unk=R.evState[id]==="done" && R.evUnk[id];
+      g.appendChild(el("text",{x:cx-16,y:cy+4,"font-size":"9","text-anchor":"middle"},fmtS(toDate(R.PD[id])).slice(0,5)));
+      g.appendChild(el("text",{x:cx+16,y:cy+4,"font-size":"9","text-anchor":"middle"},unk?"✓":fmtS(toDate(R.F[id])).slice(0,5)));
+      g.appendChild(el("text",{x:cx,y:cy+22,"font-size":"10","text-anchor":"middle",fill:dev<0?"#c62828":"#2e7d32","font-weight":"600"},unk?(dev>0?"≥+"+dev:"✓"):((dev>0?"+":"")+dev)));
+      g.appendChild(el("text",{x:cx,y:cy+RAD+13,"font-size":"10","text-anchor":"middle",fill:"#5b6673"},"план "+fmtS(toDate(R.PD[id]))+" · "+(unk?"виконано":(R.evState[id]==="done"?"факт ":"прогн. ")+fmtS(toDate(R.F[id])))));
+    }
+    g.appendChild(el("title",{},`Подія ${id}: ${E.name}\nплановий строк: ${fmt(toDate(R.PD[id]))}\nTр = ${R.TE[id]}, Tп = ${R.TL[id]}, R = ${R.TL[id]-R.TE[id]} дн.\n${R.evState[id]==="done"?"фактично":"прогноз"}: ${fmt(toDate(R.F[id]))}`));
+    svg.appendChild(g);
+  });
+  document.getElementById("sectorLegend").innerHTML = sectorLegend();
+}
+function sectorLegend(){
+  const t = view==="plan" ? ["i","Tр","Tп","R"] : ["i","план","прогн.","±"];
+  const txt = view==="plan" ? "номер події · ранній строк · пізній строк · резерв (дні від початку робіт)" : "номер події · плановий строк · фактичний/прогнозний строк · відхилення, дн. (“+” – випередження)";
+  return `<svg width="70" height="70" viewBox="0 0 70 70" style="vertical-align:middle"><circle cx="35" cy="35" r="30" fill="#fff" stroke="#2f4f6f" stroke-width="1.5"/><line x1="13.8" y1="13.8" x2="56.2" y2="56.2" stroke="#2f4f6f"/><line x1="56.2" y1="13.8" x2="13.8" y2="56.2" stroke="#2f4f6f"/><text x="35" y="22" font-size="9.5" text-anchor="middle" font-weight="700">${t[0]}</text><text x="18" y="38" font-size="8.5" text-anchor="middle">${t[1]}</text><text x="52" y="38" font-size="8.5" text-anchor="middle">${t[2]}</text><text x="35" y="56" font-size="9" text-anchor="middle">${t[3]}</text></svg> ${txt}`;
+}
+
+function drawGantt(R){
+  const svg=document.getElementById("gantt"); while(svg.firstChild) svg.removeChild(svg.firstChild);
+  const rows=ACTS.filter(a=>!a.dummy);
+  const LW=330, RH=24, TOP=44;
+  const span=Math.max(R.Tcr, ...rows.map(a=>a.FF||0))+10;
+  const W=Math.max(1200, LW+span*1.9+230), scale=(W-LW-230)/span, H=TOP+rows.length*RH+34;
+  svg.setAttribute("width",W); svg.setAttribute("height",H); svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+  const X=d=>LW+d*scale;
+  // місяці
+  const s=P(state.start); const m=new Date(s.getFullYear(), s.getMonth(), 1);
+  const MN=["січ","лют","бер","кві","тра","чер","лип","сер","вер","жов","лис","гру"];
+  while(true){ const dd=Math.round((m-s)/86400000); if(dd>span) break;
+    if(dd>=0){ svg.appendChild(el("line",{x1:X(dd),y1:TOP-8,x2:X(dd),y2:H-26,stroke:"#e3e8ee"}));
+      svg.appendChild(el("text",{x:X(dd)+2,y:TOP-12,"font-size":"10",fill:"#5b6673"},MN[m.getMonth()]+(m.getMonth()===0||dd===0?" "+m.getFullYear():""))); }
+    m.setMonth(m.getMonth()+1); }
+  svg.appendChild(el("text",{x:8,y:TOP-14,"font-size":"11.5","font-weight":"600"},"Пункт календарного плану"));
+  rows.forEach((a,k)=>{
+    const y=TOP+k*RH;
+    if(k%2===0) svg.appendChild(el("rect",{x:0,y,width:W,height:RH,fill:"#fafbfc"}));
+    svg.appendChild(el("text",{x:8,y:y+16,"font-size":"11.5",fill:a.crit?"#c62828":"#1d2530","font-weight":a.crit?"600":"400"},`${a.n}. ${a.s}`));
+    if(a.Rp>0) svg.appendChild(el("rect",{x:X(a.EF),y:y+10,width:a.Rp*scale,height:4,fill:"#cfd8dc"}));
+    const pb=el("rect",{x:X(a.ES),y:y+5,width:Math.max(2,a.t*scale),height:14,fill:a.crit?"#e6a5a5":"#b0bec5",rx:"2"});
+    pb.appendChild(el("title",{},`${a.name}\nза планом: ${fmt(toDate(a.ES))} – ${fmt(toDate(a.EF))} (${a.t} дн.)`)); svg.appendChild(pb);
+    if(a.st==="done" && !a.fact){
+      svg.appendChild(el("text",{x:X(a.EF)-2,y:y+16,"font-size":"12","text-anchor":"end",fill:"#2e7d32","font-weight":"700"},"✓"));
+    }else if(a.st==="done"){
+      const fx=X(a.FF);
+      const dm=el("path",{d:`M${fx},${y+4} l6,8 l-6,8 l-6,-8 z`,fill:"#2e7d32"});
+      dm.appendChild(el("title",{},`виконано: ${a.fact?fmt(P(a.fact)):"до "+fmt(P(state.now))+" (дату не вказано)"}`)); svg.appendChild(dm);
+    }else{
+      const fb=el("rect",{x:X(a.FS),y:y+8,width:Math.max(3,(a.FF-a.FS)*scale),height:8,fill:"#ef6c00",rx:"2"});
+      fb.appendChild(el("title",{},`прогноз: ${fmt(toDate(a.FS))} – ${fmt(toDate(a.FF))}`)); svg.appendChild(fb);
+    }
+    svg.appendChild(el("text",{x:Math.max(X(a.EF),X(a.FF||0))+10,y:y+16,"font-size":"10",fill:"#5b6673"},"план до "+fmtS(P(a.d))+(a.st!=="done"?" · прогноз "+fmtS(toDate(a.FF)):(a.fact?" · факт "+fmtS(P(a.fact)):" · виконано"))));
+  });
+  const yb=TOP+rows.length*RH;
+  svg.appendChild(el("line",{x1:X(R.NOW),y1:TOP-8,x2:X(R.NOW),y2:yb+4,stroke:"#ef6c00","stroke-width":"1.5","stroke-dasharray":"4 3"}));
+  svg.appendChild(el("text",{x:X(R.NOW)+3,y:yb+18,"font-size":"10.5",fill:"#ef6c00"},"поточна дата "+fmt(P(state.now))));
+  svg.appendChild(el("line",{x1:X(R.Tcr),y1:TOP-8,x2:X(R.Tcr),y2:yb+4,stroke:"#c62828","stroke-width":"1.5"}));
+  svg.appendChild(el("text",{x:X(R.Tcr)-3,y:yb+18,"font-size":"10.5","text-anchor":"end",fill:"#c62828"},"завершення за планом "+fmt(toDate(R.Tcr))));
+}
+
+function drawTable(R){
+  const t=document.getElementById("tbl");
+  let h=`<tr><th rowspan="2">№<br>з.п.</th><th rowspan="2">Основні заходи щодо виконання роботи</th><th rowspan="2">Код<br>(i–j)</th><th rowspan="2">Термін за планом</th><th rowspan="2">t, дн.</th>
+   <th colspan="2">Резерви, дн.</th><th rowspan="2">Статус</th><th rowspan="2">Фактична дата виконання</th><th rowspan="2">Залишилось, дн.</th><th rowspan="2">Прогноз виконання</th><th rowspan="2">Відхилення від плану, дн.</th></tr>
+   <tr><th>Rп</th><th>Rв</th></tr>`;
+  ACTS.filter(a=>!a.dummy).forEach(a=>{
+    const k=ACTS.indexOf(a);
+    const dev=day(a.d)-a.FF;
+    h+=`<tr class="${a.st==='done'?'done':(a.st==='prog'?'prog':'')} ${a.crit?'crit':''}">
+      <td>${a.n}</td><td class="name">${a.name}</td><td>${a.i}–${a.j}</td><td>${fmt(P(a.d))}</td><td>${a.t}</td><td>${a.Rp}</td><td>${a.Rv}</td>
+      <td><select data-k="${k}" class="sst">${Object.entries(ST_NAME).map(([v,l])=>`<option value="${v}" ${a.st===v?'selected':''}>${l}</option>`).join("")}</select></td>
+      <td>${a.st==='done'?`<input type="date" data-k="${k}" class="sfact" value="${a.fact||''}">`:'–'}</td>
+      <td>${a.st==='done'?'–':`<input type="number" min="0" step="1" data-k="${k}" class="srem" value="${a.rem??0}">`}</td>
+      <td>${a.st==='done'?(a.fact?fmt(P(a.fact)):'виконано'):fmt(toDate(a.FF))}</td>
+      <td class="${dev<0?'neg':'pos'}">${(a.st==='done'&&!a.fact)?(dev>0?'≥ +'+dev:'–'):((dev>0?'+':'')+dev)}</td></tr>`;
+  });
+  t.innerHTML=h;
+  t.querySelectorAll(".sst").forEach(x=>x.addEventListener("change",e=>{ const a=ACTS[+e.target.dataset.k]; a.st=e.target.value; if(a.st!=="done" && (a.rem===undefined)) a.rem=a.t; render(); }));
+  t.querySelectorAll(".sfact").forEach(x=>x.addEventListener("change",e=>{ ACTS[+e.target.dataset.k].fact=e.target.value; render(); }));
+  t.querySelectorAll(".srem").forEach(x=>x.addEventListener("change",e=>{ ACTS[+e.target.dataset.k].rem=Math.max(0,Math.round(+e.target.value||0)); render(); }));
+}
+
+function drawKpis(R){
+  const devEnd=R.PD[R.last]-R.F[R.last];
+  const path=[1]; let cur=1; while(cur!==R.last){ const nx=ACTS.find(a=>a.i===cur&&a.crit); if(!nx) break; cur=nx.j; path.push(cur); }
+  const done=ACTS.filter(a=>!a.dummy&&a.st==="done").length, total=ACTS.filter(a=>!a.dummy).length;
+  document.getElementById("kpis").innerHTML=`
+   <div class="kpi"><div class="v">${fmt(toDate(R.Tcr))}</div><div class="l">завершення за календарним планом (критичний шлях – ${R.Tcr} дн.)</div></div>
+   <div class="kpi"><div class="v">${path.join("–")}</div><div class="l">критичний шлях календарного плану (номери подій)</div></div>
+   <div class="kpi"><div class="v">${done} з ${total}</div><div class="l">пунктів календарного плану виконано</div></div>
+   <div class="kpi"><div class="v">${fmt(toDate(R.F[R.last]))}</div><div class="l">прогноз отримання рецензії за поточного стану</div></div>
+   <div class="kpi ${devEnd<0?'bad':'ok'}"><div class="v">${devEnd>0?'+':''}${devEnd} дн.</div><div class="l">${devEnd<0?'відставання від календарного плану':'випередження календарного плану'}</div></div>`;
+}
+
+function render(){ const R=compute(); drawNet(R); drawGantt(R); drawTable(R); drawKpis(R); saveState(); }
+function setView(v){ view=v; document.getElementById("tabPlan").className=v==="plan"?"on":""; document.getElementById("tabFact").className=v==="fact"?"on":""; render(); }
+function init(){
+  loadState();
+  const sd=document.getElementById("startDate"), nd=document.getElementById("nowDate");
+  sd.value=state.start; nd.value=state.now;
+  sd.addEventListener("change",()=>{ if(sd.value){ state.start=sd.value; render(); } });
+  nd.addEventListener("change",()=>{ if(nd.value){ state.now=nd.value; render(); } });
+  document.getElementById("tabPlan").addEventListener("click",()=>setView("plan"));
+  document.getElementById("tabFact").addEventListener("click",()=>setView("fact"));
+  document.getElementById("btnReset").addEventListener("click",()=>{ localStorage.removeItem(STORE); loadState(); sd.value=state.start; nd.value=state.now; render(); });
+  document.getElementById("btnSvg").addEventListener("click",()=>{
+    const s=document.getElementById("net").cloneNode(true); s.setAttribute("xmlns","http://www.w3.org/2000/svg");
+    const blob=new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n'+new XMLSerializer().serializeToString(s)],{type:"image/svg+xml"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="Merezhevyi_hrafik_KRM_"+view+".svg"; a.click();
+  });
+  render();
+}
+init();
+</script>
+</body>
+</html>
